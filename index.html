@@ -9,14 +9,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         body { font-family: 'Press Start 2P', system-ui; background: #111827; color: white; }
-        .dice {
-            width: 110px; height: 110px;
-            background: linear-gradient(145deg, #fff, #f1f1f1);
-            border-radius: 18px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 8px 15px rgba(255,255,255,0.8), inset 0 -8px 15px rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; font-size: 85px;
-        }
+        .dice { width: 110px; height: 110px; background: linear-gradient(145deg,#fff,#f1f1f1); border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 8px 15px rgba(255,255,255,0.8), inset 0 -8px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; position: relative; font-size: 85px; }
         .dice-number { position: absolute; font-size: 62px; font-weight: bold; color: #111827; text-shadow: 0 0 15px #fbbf24; z-index: 10; }
         @keyframes shake { 0%{transform:translate(0,0)rotate(0deg)} 10%{transform:translate(-6px,5px)rotate(-8deg)} 20%{transform:translate(5px,-4px)rotate(7deg)} 30%{transform:translate(-4px,3px)rotate(-6deg)} 40%{transform:translate(6px,-5px)rotate(8deg)} 50%{transform:translate(-3px,4px)rotate(-4deg)} 100%{transform:translate(0,0)rotate(0deg)} }
         .shake { animation: shake 0.9s; }
@@ -32,7 +25,7 @@
                 <div id="avatar" class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-3xl">👤</div>
                 <div>
                     <div id="username" class="font-bold">Guest</div>
-                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: local-test</div>
+                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: loading...</div>
                 </div>
             </div>
             <div class="text-right">
@@ -68,15 +61,16 @@
                 <div id="result-text" class="text-2xl font-bold mt-2"></div>
             </div>
 
-            <div class="bg-zinc-800 rounded-2xl p-6">
-                <div class="text-center text-xs mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span> (<span id="current-choice-display" class="text-yellow-400">chưa chọn</span>)</div>
-                <div class="flex gap-4 mb-6">
-                    <button onclick="selectChoice('Tai')" id="btn-tai" class="flex-1 py-5 rounded-2xl bg-green-600 font-bold text-xl">TÀI</button>
-                    <button onclick="selectChoice('Xiu')" id="btn-xiu" class="flex-1 py-5 rounded-2xl bg-red-600 font-bold text-xl">XỈU</button>
+            <!-- PHẦN ĐẶT CƯỢC ĐÃ GỌN -->
+            <div class="bg-zinc-800 rounded-2xl p-4">
+                <div class="text-center text-xs mb-3">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span> (<span id="current-choice-display" class="text-yellow-400">chưa chọn</span>)</div>
+                <div class="flex gap-3 mb-4">
+                    <button onclick="selectChoice('Tai')" id="btn-tai" class="flex-1 py-4 rounded-xl bg-green-600 font-bold text-base">TÀI</button>
+                    <button onclick="selectChoice('Xiu')" id="btn-xiu" class="flex-1 py-4 rounded-xl bg-red-600 font-bold text-base">XỈU</button>
                 </div>
-                <div class="flex gap-3">
-                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-zinc-900 text-center text-3xl py-5 rounded-2xl" oninput="updateBetDisplay()">
-                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-8 rounded-2xl font-bold">MAX</button>
+                <div class="flex gap-2">
+                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-zinc-900 text-center text-2xl py-4 rounded-xl" oninput="updateBetDisplay()">
+                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-6 py-4 rounded-xl font-bold text-sm">MAX</button>
                 </div>
             </div>
         </div>
@@ -127,12 +121,10 @@
                     total += num;
                 }
                 diceEls.forEach(d => d.classList.remove('shake'));
-
                 document.getElementById('result-sum').textContent = total;
                 const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
                 document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
 
-                // CỘNG / TRỪ ĐIỂM
                 if (betAmount >= 10 && choice) {
                     balance += win ? betAmount : -betAmount;
                     if (balance < 0) balance = 0;
@@ -142,10 +134,7 @@
                 choice = '';
                 betAmount = 0;
                 document.getElementById('bet-amount').value = '0';
-                document.getElementById('current-bet-display').textContent = '0 Credits';
-                document.getElementById('current-choice-display').textContent = 'chưa chọn';
-                document.getElementById('btn-tai').classList.remove('bg-green-500');
-                document.getElementById('btn-xiu').classList.remove('bg-red-500');
+                updateBetDisplay();
             }, 900);
         }
 
@@ -182,7 +171,6 @@
             if (betAmount > balance) {
                 betAmount = balance;
                 input.value = balance;
-                alert('Không thể đặt cược quá số dư!');
             }
             document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
             document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
