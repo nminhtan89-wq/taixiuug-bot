@@ -24,7 +24,7 @@
 
         /* TABS */
         .tabs { display: flex; background: #000; border-bottom: 1px solid #222; }
-        .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; color: #555; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; color: #555; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
         .tab-btn.active { color: #ffeb3b; border-bottom: 3px solid #ffeb3b; }
 
         /* GAME AREA */
@@ -40,7 +40,7 @@
         .shake { animation: shake 0.1s infinite; }
 
         .result-sum { font-size: 40px; color: #fff176; font-weight: 900; margin-bottom: 10px; }
-        .status-text { font-size: 14px; font-weight: 700; text-transform: uppercase; min-height: 20px; margin-bottom: 25px; }
+        .status-text { font-size: 14px; font-weight: 700; text-transform: uppercase; min-height: 20px; margin-bottom: 25px; text-align: center; }
 
         /* CHOICE BUTTONS */
         .choice-group { display: flex; gap: 12px; width: 100%; margin-bottom: 20px; }
@@ -51,51 +51,17 @@
         .btn-label { font-size: 20px; font-weight: 900; display: block; margin-bottom: 2px; }
         .btn-sub { font-size: 11px; font-weight: 600; opacity: 0.8; }
 
-        /* BET BOX - FIX CHẶN CƯỢC */
+        /* BET BOX */
         .bet-box { background: #111; border-radius: 20px; padding: 18px; width: 100%; border: 1px solid #222; }
         .bet-info { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 12px; font-weight: 700; }
         
-        .bet-input-container { 
-            display: flex; 
-            background: #000; 
-            border: 2px solid #ffeb3b; 
-            border-radius: 14px; 
-            height: 60px; 
-            overflow: hidden; 
-            width: 100%;
-            align-items: stretch;
-        }
-        
-        .bet-input { 
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            color: #ffeb3b; 
-            font-size: 24px; 
-            font-weight: 900;
-            padding: 0 15px; 
-            outline: none; 
-            text-align: right;
-            width: 100%;
-            min-width: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-max { 
-            background: #ffeb3b; 
-            color: #000; 
-            border: none; 
-            font-size: 14px; 
-            font-weight: 900; 
-            padding: 0 25px; 
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
+        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 60px; overflow: hidden; width: 100%; align-items: stretch; }
+        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 24px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; width: 100%; font-family: 'Inter', sans-serif; }
+        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 14px; font-weight: 900; padding: 0 25px; cursor: pointer; display: flex; align-items: center; }
 
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .tab-content.hidden { display: none; }
-        .footer { padding: 20px; text-align: center; font-size: 10px; color: #444; font-weight: 700; margin-top: auto; letter-spacing: 1px; }
+        .footer { padding: 20px; text-align: center; font-size: 10px; color: #444; font-weight: 700; margin-top: auto; }
     </style>
 </head>
 <body>
@@ -150,11 +116,7 @@
                     <span>ĐÃ CHỌN: <span id="current-bet-display" style="color:#ffeb3b">10.00</span></span>
                 </div>
                 <div class="bet-input-container">
-                    <input id="bet-amount" type="number" value="10" 
-                           class="bet-input" 
-                           oninput="validateBet()" 
-                           onkeyup="validateBet()" 
-                           onblur="validateBet()">
+                    <input id="bet-amount" type="number" value="10" class="bet-input" oninput="validateBet()" onblur="validateBet()">
                     <button onclick="setMaxBet()" class="btn-max">MAX</button>
                 </div>
             </div>
@@ -165,10 +127,9 @@
             <div style="background:#000; padding:15px; margin:20px 0; border:1px solid #222; word-break:break-all; font-size: 12px; border-radius: 10px;">0x71C4B136155554157121215444541571212154</div>
             <p style="font-size: 11px; color: #888;">Sau khi chuyển khoản, vui lòng chờ 1-3 phút để hệ thống xác nhận.</p>
         </div>
-        
         <div id="content2" class="tab-content hidden" style="padding: 40px; text-align: center;">
             <p style="color:#ef4444; font-weight: 700;">RÚT TIỀN</p>
-            <p style="margin-top:20px; color: #888;">Tính năng rút tiền đang được bảo trì nâng cấp.</p>
+            <p style="margin-top:20px; color: #888;">Hệ thống bảo trì.</p>
         </div>
 
         <div class="footer">DICE MASTER • SECURE & FAIR PLAY</div>
@@ -192,35 +153,27 @@
                 document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
                 document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
             }
-            const saved = localStorage.getItem(`bal_v3_${telegramId}`);
+            const saved = localStorage.getItem(`bal_v4_${telegramId}`);
             if (saved) balance = parseFloat(saved);
             updateBalance();
             startCountdown();
         }
 
-        // --- KHÓA CHẶN CƯỢC TRIỆT ĐỂ ---
         function validateBet() {
             let input = document.getElementById('bet-amount');
             let val = parseFloat(input.value);
-            
-            // Nếu xóa trắng hoặc gõ chữ
-            if (isNaN(val) || val < 0) {
-                val = 0;
-            }
-            
-            // Nếu vượt quá số dư
+            if (isNaN(val) || val < 0) val = 0;
             if (val > balance) {
                 val = balance;
-                input.value = val; // Ép input hiển thị đúng số dư ngay lập tức
+                input.value = val;
             }
-            
             betAmount = val;
             document.getElementById('current-bet-display').textContent = betAmount.toFixed(2);
         }
 
         function updateBalance() {
             document.getElementById('balance').textContent = balance.toFixed(2);
-            localStorage.setItem(`bal_v3_${telegramId}`, balance);
+            localStorage.setItem(`bal_v4_${telegramId}`, balance);
         }
 
         function setMaxBet() {
@@ -236,7 +189,17 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
+        // --- HÀM LẮC XÚC XẮC ĐÃ CHẶN LỖI HẾT ĐIỂM ---
         function rollDice() {
+            // Kiểm tra: Nếu người chơi có chọn cửa nhưng tiền cược bằng 0 hoặc lớn hơn số dư
+            if (choice !== '' && (betAmount <= 0 || betAmount > balance)) {
+                document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">HẾT TIỀN! VUI LÒNG NẠP THÊM</span>`;
+                choice = ''; // Hủy lựa chọn để không bị trừ tiền vớ vẩn
+                document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
+                setTimeout(startCountdown, 3000);
+                return; // Dừng lại không lắc
+            }
+
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
             diceEls.forEach(d => d.classList.add('shake'));
             document.getElementById('status-text').textContent = "Đang lắc...";
