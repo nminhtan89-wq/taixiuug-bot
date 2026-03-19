@@ -8,22 +8,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; }
-        .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 450px; background: #050505; min-height: 100vh; display: flex; flex-direction: column; position: relative; border-left: 1px solid #222; border-right: 1px solid #222; }
         
+        /* HEADER */
         .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; }
         .avatar { width: 40px; height: 40px; background: #ffeb3b; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: black; font-weight: bold; }
         .balance-amount { font-size: 20px; color: #fff176; font-weight: 900; }
 
+        /* HISTORY */
         .history-container { background: #111; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: center; gap: 6px; min-height: 48px; }
-        .ball { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 900; color: white; }
+        .ball { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 900; color: white; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.4); }
         .ball-tai { background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000); }
         .ball-xiu { background: radial-gradient(circle at 30% 30%, #4facfe, #0061ff); }
 
+        /* GAME */
         .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .countdown-num { font-size: 70px; color: #ffeb3b; font-weight: 900; }
+        .countdown-num { font-size: 70px; color: #ffeb3b; font-weight: 900; text-shadow: 0 0 15px rgba(255,235,59,0.3); }
         .dice-area { display: flex; gap: 12px; margin: 15px 0; height: 85px; }
-        .dice { width: 75px; height: 75px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #111; font-weight: 900; }
+        .dice { width: 75px; height: 75px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #111; font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
         .choice-group { display: flex; gap: 10px; width: 100%; margin-bottom: 25px; }
         .btn-choice { flex: 1; padding: 20px 0; border-radius: 15px; border: none; cursor: pointer; color: white; font-weight: 900; font-size: 20px; opacity: 0.5; transition: 0.2s; border-bottom: 4px solid rgba(0,0,0,0.3); }
@@ -39,9 +42,14 @@
         .bet-input::-webkit-outer-spin-button, .bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .btn-max { background: #ffeb3b; color: #000; border: none; padding: 0 15px; font-weight: 900; cursor: pointer; }
 
-        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; }
+        /* COPYRIGHT */
+        .copyright { padding: 15px; text-align: center; font-size: 11px; color: #444; border-top: 1px solid #111; margin-top: auto; }
+        .copyright a { color: #ffeb3b; text-decoration: none; font-weight: 700; }
+
+        /* MODAL */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-content { width: 85%; background: #111; border-radius: 20px; padding: 25px; border: 1px solid #333; }
-        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 10px; }
+        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -53,7 +61,9 @@
             </div>
             <div id="balance" class="balance-amount">0.00</div>
         </div>
+
         <div class="history-container" id="history-bar"></div>
+
         <div id="payment-modal" class="modal-overlay">
             <div class="modal-content">
                 <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
@@ -66,12 +76,13 @@
                     <button class="btn-submit" onclick="copyWallet()">COPY VÍ ADMIN</button>
                 </div>
                 <div id="box-rut" style="display:none;">
-                    <input type="text" id="user-wallet-input" placeholder="Ví BEP-20" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px;">
-                    <input type="number" id="user-withdraw-amount" placeholder="Số tiền" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px;">
+                    <input type="text" id="user-wallet-input" placeholder="Ví BEP-20 của bạn" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
+                    <input type="number" id="user-withdraw-amount" placeholder="Số tiền" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
                     <button class="btn-submit" onclick="requestWithdraw()">GỬI LỆNH RÚT</button>
                 </div>
             </div>
         </div>
+
         <div class="game-content">
             <div id="countdown" class="countdown-num">20</div>
             <div class="dice-area"><div id="dice1" class="dice">?</div><div id="dice2" class="dice">?</div><div id="dice3" class="dice">?</div></div>
@@ -87,19 +98,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="copyright">
+            Liên hệ làm App: <a href="https://t.me/premiumtelevn" target="_blank">@premiumtelevn</a>
+        </div>
     </div>
+
     <script>
         const tg = window.Telegram.WebApp;
-        // LINK WEB APP MỚI NHẤT CỦA BẠN
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7HcjQy7vTl9lpS9DBDTwmSdpHEStbKgtdf11uWaf2se3eJvcbqU-bRvsM7Gb3fUhz/exec";
+        // DÁN LINK GOOGLE /EXEC CỦA BẠN VÀO ĐÂY
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvvccszq-RwBrlBKMICV29uwDOhQJ5H5epEZGXJQ8Z1AYhO-JcLdn6y8UBt8-B-NU/exec";
 
-        let telegramId = 'guest'; let balance = 0; let choice = ''; let betAmount = 0; let history = [];
+        let telegramId = 'guest'; let balance = 0; let choice = ''; let betAmount = 0; let history = []; let countdown = 20;
 
         async function initApp() {
             tg.ready(); tg.expand();
             if (tg.initDataUnsafe.user) {
                 telegramId = tg.initDataUnsafe.user.id.toString();
-                document.getElementById('username').innerText = (tg.initDataUnsafe.user.username || "USER").toUpperCase();
+                document.getElementById('username').innerText = (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || "USER").toUpperCase();
                 document.getElementById('tg-id-display').innerText = telegramId;
                 document.getElementById('avatar').innerText = (tg.initDataUnsafe.user.first_name || "G").charAt(0);
             }
@@ -123,7 +139,7 @@
         async function requestWithdraw() {
             const wallet = document.getElementById('user-wallet-input').value;
             const withdrawAmount = parseFloat(document.getElementById('user-withdraw-amount').value);
-            if (!wallet || isNaN(withdrawAmount) || withdrawAmount <= 0 || withdrawAmount > balance) { alert("Dữ liệu sai!"); return; }
+            if (!wallet || isNaN(withdrawAmount) || withdrawAmount <= 0 || withdrawAmount > balance) { alert("Dữ liệu không hợp lệ!"); return; }
             let newBalance = balance - withdrawAmount;
             try {
                 const url = `${SCRIPT_URL}?action=withdraw&userId=${telegramId}&amount=${newBalance}&withdrawAmount=${withdrawAmount}&wallet=${encodeURIComponent(wallet)}`;
@@ -132,27 +148,27 @@
                     balance = newBalance; document.getElementById('balance').innerText = balance.toFixed(2);
                     alert("Đã gửi lệnh rút thành công!"); toggleModal(false);
                 }
-            } catch (e) { alert("Lỗi kết nối!"); }
+            } catch (e) { alert("Lỗi kết nối server!"); }
         }
 
         function validateBet() {
             let input = document.getElementById('bet-amount');
             let val = parseFloat(input.value) || 0;
             if (val > balance) { val = balance; input.value = balance; }
+            if (val < 0) { val = 0; input.value = 0; }
             betAmount = val;
         }
 
         function rollDice() {
-            if (choice !== '' && (betAmount > balance || balance <= 0 || betAmount <= 0)) { resetUI(); return; }
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-            diceEls.forEach(d => d.innerHTML = `...`);
+            diceEls.forEach(d => d.innerText = "...");
             setTimeout(() => {
                 let total = 0; let results = [];
                 for (let i = 0; i < 3; i++) { const n = Math.floor(Math.random() * 6) + 1; results.push(n); total += n; }
                 diceEls.forEach((d, i) => d.innerText = results[i]);
                 const outcome = (total >= 11) ? 'Tai' : 'Xiu';
                 history.push(outcome); updateHistoryUI();
-                if (choice !== '') {
+                if (choice !== '' && betAmount > 0) {
                     if (choice === outcome) syncBalance(balance + betAmount);
                     else syncBalance(balance - betAmount);
                 }
@@ -169,10 +185,9 @@
         }
 
         function startCountdown() {
-            let c = 20;
             setInterval(() => {
-                document.getElementById('countdown').innerText = c;
-                if (c-- <= 0) { c = 20; rollDice(); }
+                document.getElementById('countdown').innerText = countdown;
+                if (countdown-- <= 0) { countdown = 20; rollDice(); }
             }, 1000);
         }
 
@@ -180,8 +195,8 @@
         function setMaxBet() { document.getElementById('bet-amount').value = balance; validateBet(); }
         function toggleModal(s) { document.getElementById('payment-modal').style.display = s ? 'flex' : 'none'; }
         function switchPayTab(t) { document.getElementById('box-nap').style.display = t === 'nap' ? 'block' : 'none'; document.getElementById('box-rut').style.display = t === 'rut' ? 'block' : 'none'; }
-        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy!"); }
-        function resetUI() { choice = ''; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); }
+        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví!"); }
+        function resetUI() { choice = ''; betAmount = 0; document.getElementById('bet-amount').value = 0; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); }
         
         initApp();
     </script>
