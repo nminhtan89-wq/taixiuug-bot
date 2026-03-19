@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Master - Tài Xỉu</title>
+    <title>Dice Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -18,7 +18,7 @@
             position: relative; font-size: 85px;
         }
         .dice-number { position: absolute; font-size: 62px; font-weight: bold; color: #111827; text-shadow: 0 0 15px #fbbf24; z-index: 10; }
-        @keyframes shake { 0% { transform: translate(0,0) rotate(0deg); } 10% { transform: translate(-6px,5px) rotate(-8deg); } 20% { transform: translate(5px,-4px) rotate(7deg); } 30% { transform: translate(-4px,3px) rotate(-6deg); } 40% { transform: translate(6px,-5px) rotate(8deg); } 50% { transform: translate(-3px,4px) rotate(-4deg); } 100% { transform: translate(0,0) rotate(0deg); } }
+        @keyframes shake { 0%{transform:translate(0,0)rotate(0deg)} 10%{transform:translate(-6px,5px)rotate(-8deg)} 20%{transform:translate(5px,-4px)rotate(7deg)} 30%{transform:translate(-4px,3px)rotate(-6deg)} 40%{transform:translate(6px,-5px)rotate(8deg)} 50%{transform:translate(-3px,4px)rotate(-4deg)} 100%{transform:translate(0,0)rotate(0deg)} }
         .shake { animation: shake 0.9s; }
         .tab-active { border-bottom: 4px solid #fbbf24; }
     </style>
@@ -32,7 +32,7 @@
                 <div id="avatar" class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-3xl">👤</div>
                 <div>
                     <div id="username" class="font-bold">Guest</div>
-                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: loading...</div>
+                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: local-test</div>
                 </div>
             </div>
             <div class="text-right">
@@ -69,6 +69,138 @@
             </div>
 
             <div class="bg-zinc-800 rounded-2xl p-6">
-                <div class="text-center text-xs mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span></div>
+                <div class="text-center text-xs mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span> (<span id="current-choice-display" class="text-yellow-400">chưa chọn</span>)</div>
                 <div class="flex gap-4 mb-6">
-                    <button onclick="selectChoice('Tai')" id="btn
+                    <button onclick="selectChoice('Tai')" id="btn-tai" class="flex-1 py-5 rounded-2xl bg-green-600 font-bold text-xl">TÀI</button>
+                    <button onclick="selectChoice('Xiu')" id="btn-xiu" class="flex-1 py-5 rounded-2xl bg-red-600 font-bold text-xl">XỈU</button>
+                </div>
+                <div class="flex gap-3">
+                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-zinc-900 text-center text-3xl py-5 rounded-2xl" oninput="updateBetDisplay()">
+                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-8 rounded-2xl font-bold">MAX</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NẠP USDT TAB -->
+        <div id="content1" class="flex-1 p-6 hidden">
+            <div class="bg-zinc-800 rounded-3xl p-8 text-center">
+                <div class="text-2xl font-bold text-yellow-400 mb-6">NẠP USDT (BEP-20)</div>
+                <div class="bg-black p-5 rounded-2xl mb-6">
+                    <div class="font-mono text-emerald-400 text-sm break-all" id="wallet-address">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
+                </div>
+                <button onclick="copyAddress()" class="bg-emerald-500 hover:bg-emerald-600 w-full py-5 rounded-2xl font-bold text-xl">📋 COPY ĐỊA CHỈ</button>
+            </div>
+        </div>
+
+        <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Hiệu ứng 3D</div>
+    </div>
+
+    <script>
+        let telegramId = 'local-test';
+        let balance = 500;
+        let choice = '';
+        let betAmount = 0;
+        let countdown = 20;
+        let countdownInterval = null;
+        let recentResults = [];
+
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (user && user.id) {
+                telegramId = user.id.toString();
+                document.getElementById('username').textContent = user.first_name || 'Player';
+                document.getElementById('avatar').textContent = '👤';
+            }
+        }
+        document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+
+        function rollDiceAuto() {
+            const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+            diceEls.forEach(d => d.classList.add('shake'));
+            setTimeout(() => {
+                let total = 0;
+                for (let i = 0; i < 3; i++) {
+                    const num = Math.floor(Math.random() * 6) + 1;
+                    diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
+                    total += num;
+                }
+                diceEls.forEach(d => d.classList.remove('shake'));
+
+                document.getElementById('result-sum').textContent = total;
+                const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
+                document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
+
+                // CỘNG / TRỪ ĐIỂM
+                if (betAmount >= 10 && choice) {
+                    balance += win ? betAmount : -betAmount;
+                    if (balance < 0) balance = 0;
+                    document.getElementById('balance').textContent = balance.toFixed(2);
+                }
+
+                choice = '';
+                betAmount = 0;
+                document.getElementById('bet-amount').value = '0';
+                document.getElementById('current-bet-display').textContent = '0 Credits';
+                document.getElementById('current-choice-display').textContent = 'chưa chọn';
+                document.getElementById('btn-tai').classList.remove('bg-green-500');
+                document.getElementById('btn-xiu').classList.remove('bg-red-500');
+            }, 900);
+        }
+
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdown = 20;
+            document.getElementById('countdown').textContent = 20;
+            countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    rollDiceAuto();
+                    setTimeout(startCountdown, 1200);
+                }
+            }, 1000);
+        }
+
+        function selectChoice(c) {
+            choice = c;
+            document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
+            document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
+            updateBetDisplay();
+        }
+
+        function setMaxBet() {
+            document.getElementById('bet-amount').value = balance;
+            updateBetDisplay();
+        }
+
+        function updateBetDisplay() {
+            let input = document.getElementById('bet-amount');
+            betAmount = parseFloat(input.value) || 0;
+            if (betAmount > balance) {
+                betAmount = balance;
+                input.value = balance;
+                alert('Không thể đặt cược quá số dư!');
+            }
+            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
+            document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
+            alert('✅ Đã copy địa chỉ ví!');
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('tab-active', i===n));
+            document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
+        }
+
+        // INIT
+        switchTab(0);
+        startCountdown();
+    </script>
+</body>
+</html>
