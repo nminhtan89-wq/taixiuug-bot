@@ -3,37 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE MASTER PRO - FINAL ADMIN FIX</title>
+    <title>DICE MASTER PRO - FINAL EDITION</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; position: relative; }
+        
+        /* HEADER */
         .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; }
         .user-profile-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .avatar { width: 40px; height: 40px; background: #ffeb3b; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: black; font-weight: bold; }
-        .balance-amount { font-size: 20px; color: #fff176; font-weight: 900; }
-        .history-container { background: #111; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: center; gap: 6px; overflow: hidden; min-height: 48px; }
-        .ball { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 900; color: white; }
+        .avatar { width: 42px; height: 42px; background: #ffeb3b; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: black; font-weight: bold; }
+        .username { font-size: 14px; font-weight: 700; color: #fff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .balance-amount { font-size: 22px; color: #fff176; font-weight: 900; }
+
+        /* LỊCH SỬ CẦU */
+        .history-container { background: #111; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: center; gap: 8px; overflow: hidden; min-height: 48px; }
+        .ball { width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; color: white; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.4); }
         .ball-tai { background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000); }
         .ball-xiu { background: radial-gradient(circle at 30% 30%, #4facfe, #0061ff); }
-        .game-content { padding: 15px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .countdown-num { font-size: 75px; color: #ffeb3b; font-weight: 900; }
-        .dice-area { display: flex; gap: 12px; margin: 15px 0; height: 85px; }
-        .dice { width: 80px; height: 80px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-size: 45px; color: #111; font-weight: 900; }
+
+        /* GAME CONTENT */
+        .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .countdown-num { font-size: 80px; color: #ffeb3b; font-weight: 900; text-shadow: 0 0 25px rgba(255,235,59,0.3); }
+        .dice-area { display: flex; gap: 15px; margin: 20px 0; height: 90px; }
+        .dice { width: 85px; height: 85px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 18px; display: flex; justify-content: center; align-items: center; font-size: 45px; color: #111; font-weight: 900; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
         .shake { animation: shake 0.1s infinite; }
-        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-8deg)} 50%{transform:rotate(8deg)} 100%{transform:rotate(0deg)} }
-        .choice-group { display: flex; gap: 10px; width: 100%; margin-bottom: 25px; }
-        .btn-choice { flex: 1; padding: 20px 0; border-radius: 15px; border: none; cursor: pointer; border-bottom: 4px solid rgba(0,0,0,0.3); background: #333; color: white; font-weight: 900; font-size: 20px; }
-        .btn-xiu.active { background: #2563eb; outline: 3px solid white; transform: scale(1.02); }
-        .btn-tai.active { background: #dc2626; outline: 3px solid white; transform: scale(1.02); }
-        .bet-box { background: #111; border-radius: 18px; padding: 15px; width: 100%; border: 1px solid #222; }
-        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 12px; height: 55px; overflow: hidden; }
-        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 22px; font-weight: 900; padding: 0 15px; text-align: right; outline: none; }
-        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-content { width: 85%; background: #111; border-radius: 20px; padding: 25px; border: 1px solid #333; }
-        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 10px; cursor: pointer; }
+        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} 100%{transform:rotate(0deg)} }
+
+        /* NÚT ĐẶT CƯỢC MÀU SẮC (NEW) */
+        .choice-group { display: flex; gap: 15px; width: 100%; margin-bottom: 25px; }
+        .btn-choice { flex: 1; padding: 25px 0; border-radius: 20px; border: none; cursor: pointer; color: white; font-weight: 900; font-size: 24px; border-bottom: 5px solid rgba(0,0,0,0.3); transition: 0.1s; opacity: 0.6; }
+        .btn-xiu { background: #2563eb; } /* Xanh dương cho Xỉu */
+        .btn-tai { background: #dc2626; } /* Đỏ rực cho Tài */
+        .btn-choice.active { opacity: 1; transform: scale(1.05); border-bottom: none; outline: 3px solid white; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+
+        /* BET BOX */
+        .bet-box { background: #111; border-radius: 20px; padding: 20px; width: 100%; border: 1px solid #222; }
+        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 65px; overflow: hidden; }
+        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 26px; font-weight: 900; padding: 0 15px; text-align: right; outline: none; }
+        .btn-max { background: #ffeb3b; color: #000; border: none; padding: 0 25px; font-weight: 900; cursor: pointer; }
+
+        /* MODAL */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { width: 85%; background: #111; border-radius: 24px; padding: 30px; border: 1px solid #333; }
+        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 15px; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -42,13 +57,13 @@
             <div class="user-profile-btn" onclick="toggleModal(true)">
                 <div id="avatar" class="avatar">?</div>
                 <div class="username-area">
-                    <div id="username" style="font-size:13px; font-weight:700;">LOADING...</div>
-                    <div style="font-size:9px; color:#4ae3b5;">ID: <span id="tg-id-display">...</span> ▼</div>
+                    <div id="username" class="username">GUEST</div>
+                    <div style="font-size: 10px; color: #4ae3b5;">ID: <span id="tg-id-display">...</span> ▼</div>
                 </div>
             </div>
-            <div class="balance-group">
+            <div class="balance-group" style="text-align: right;">
                 <div id="balance" class="balance-amount">0.00</div>
-                <div style="font-size:9px; color:#666; text-align:right;">CREDITS</div>
+                <div style="font-size: 10px; color: #666; font-weight: 700;">CREDITS</div>
             </div>
         </div>
 
@@ -57,17 +72,20 @@
         <div id="payment-modal" class="modal-overlay">
             <div class="modal-content">
                 <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                    <button id="btn-tab-nap" style="color:#ffeb3b; background:none; border:none; font-weight:bold;" onclick="switchPayTab('nap')">NẠP</button>
-                    <button id="btn-tab-rut" style="color:#666; background:none; border:none; font-weight:bold;" onclick="switchPayTab('rut')">RÚT</button>
-                    <button onclick="toggleModal(false)" style="color:#fff; background:none; border:none;">Đóng</button>
+                    <button id="btn-tab-nap" style="color:#ffeb3b; background:none; border:none; font-weight:bold; font-size:16px;" onclick="switchPayTab('nap')">NẠP TIỀN</button>
+                    <button id="btn-tab-rut" style="color:#666; background:none; border:none; font-weight:bold; font-size:16px;" onclick="switchPayTab('rut')">RÚT TIỀN</button>
+                    <button onclick="toggleModal(false)" style="color:#fff; background:none; border:none; font-size:20px;">×</button>
                 </div>
+                
                 <div id="box-nap" style="text-align:center;">
-                    <div style="background:#000; padding:12px; font-size:10px; margin-bottom:10px; border:1px solid #222; border-radius:8px;" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
-                    <button class="btn-submit" onclick="copyWallet()">SAO CHÉP VÍ ADMIN</button>
+                    <p style="font-size:11px; color:#888; margin-bottom:10px;">VÍ NHẬN USDT (BEP-20)</p>
+                    <div style="background:#000; padding:15px; font-size:11px; margin-bottom:15px; border:1px solid #222; border-radius:10px; word-break:break-all;" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
+                    <button class="btn-submit" onclick="copyWallet()">COPY VÍ ADMIN</button>
                 </div>
+
                 <div id="box-rut" style="display:none;">
-                    <input type="text" id="user-wallet-input" placeholder="Ví nhận BEP-20" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px;">
-                    <input type="number" id="user-withdraw-amount" placeholder="Số tiền rút" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px;">
+                    <input type="text" id="user-wallet-input" placeholder="Nhập ví BEP-20 của bạn" style="width:100%; padding:15px; margin-bottom:15px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
+                    <input type="number" id="user-withdraw-amount" placeholder="Số tiền cần rút" style="width:100%; padding:15px; margin-bottom:15px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
                     <button class="btn-submit" onclick="requestWithdraw()">GỬI LỆNH RÚT TIỀN</button>
                 </div>
             </div>
@@ -80,27 +98,28 @@
                 <div id="dice2" class="dice">?</div>
                 <div id="dice3" class="dice">?</div>
             </div>
-            <div id="status-text" style="font-size:14px; font-weight:700; margin-bottom:25px; color:#aaa;">Mời đặt cửa...</div>
+            <div id="status-text" style="font-size:16px; font-weight:700; margin-bottom:25px; color:#888; text-transform:uppercase;">Mời đặt cửa...</div>
+            
             <div class="choice-group">
-                <button id="btn-xiu" onclick="selectChoice('Xiu')" class="btn-choice">XỈU</button>
-                <button id="btn-tai" onclick="selectChoice('Tai')" class="btn-choice">TÀI</button>
+                <button id="btn-xiu" onclick="selectChoice('Xiu')" class="btn-choice btn-xiu">XỈU</button>
+                <button id="btn-tai" onclick="selectChoice('Tai')" class="btn-choice btn-tai">TÀI</button>
             </div>
+
             <div class="bet-box">
                 <div class="bet-input-container">
                     <input id="bet-amount" type="number" value="0" class="bet-input" oninput="validateBet()">
-                    <button onclick="setMaxBet()" style="background:#ffeb3b; border:none; padding:0 20px; font-weight:900;">MAX</button>
+                    <button onclick="setMaxBet()" class="btn-max">MAX</button>
                 </div>
             </div>
         </div>
+        <div style="padding:15px; text-align:center; font-size:10px; color:#222;">SYSTEM PROTECTED BY @taixiuug_bot</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         
-        // --- CẤU HÌNH NIÊM PHONG ---
-        const BOT_TOKEN = "8726888181:AAGsxbvvkLumwiey1vWi3o4wfZhLyCnGGw8"; 
-        const ADMIN_CHAT_ID = "844381037"; // ID CHUẨN CỦA BẠN
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvvccszq-RwBrlBKMICV29uwDOhQJ5H5epEZGXJQ8Z1AYhO-JcLdn6y8UBt8-B-NU/exec";
+        // --- CẤU HÌNH LIÊN KẾT ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnKwyJCcuM7NUygKlu7y8-nviFvep79Euc7hwkd3giOXcYrVCZsN-kBanrFFYzpFh0/exec";
 
         let telegramId = 'guest';
         let balance = 0;
@@ -136,24 +155,22 @@
             fetch(`${SCRIPT_URL}?action=update&userId=${telegramId}&amount=${balance}`);
         }
 
-        // HÀM RÚT TIỀN THÔNG BÁO CHO ADMIN
+        // HÀM RÚT TIỀN QUA SERVER GOOGLE
         async function requestWithdraw() {
             const wallet = document.getElementById('user-wallet-input').value;
-            const amount = parseFloat(document.getElementById('user-withdraw-amount').value);
-            if (!wallet || isNaN(amount) || amount <= 0 || amount > balance) { alert("Lỗi dữ liệu!"); return; }
+            const amountInput = parseFloat(document.getElementById('user-withdraw-amount').value);
+            if (!wallet || isNaN(amountInput) || amountInput <= 0 || amountInput > balance) { alert("Thông tin không hợp lệ!"); return; }
 
-            const message = `🔔 LỆNH RÚT MỚI (@taixiuug_bot)\n──────────────\n👤 ID: ${telegramId}\n💰 Tiền: ${amount.toFixed(2)}\n🏦 Ví: ${wallet}`;
+            let newBalance = balance - amountInput;
             try {
-                // 1. Cập nhật số dư Google Sheets
-                await syncBalance(balance - amount);
-                
-                // 2. Gửi tin nhắn về Telegram (Phương thức ngầm để không bị chặn)
-                const api_url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
-                const ping = new Image();
-                ping.src = api_url;
-
-                alert("Lệnh rút đã gửi thành công!");
-                toggleModal(false);
+                const url = `${SCRIPT_URL}?action=withdraw&userId=${telegramId}&amount=${newBalance}&wallet=${encodeURIComponent(wallet)}`;
+                const res = await fetch(url);
+                if (await res.text() === "SENT") {
+                    balance = newBalance;
+                    document.getElementById('balance').textContent = balance.toFixed(2);
+                    alert("Đã gửi lệnh rút thành công qua Server!");
+                    toggleModal(false);
+                }
             } catch (e) { alert("Lỗi kết nối Server!"); }
         }
 
@@ -166,6 +183,7 @@
                 for (let i = 0; i < 3; i++) { const n = Math.floor(Math.random() * 6) + 1; results.push(n); total += n; }
                 diceEls.forEach((d, i) => { d.classList.remove('shake'); d.innerHTML = results[i]; });
                 const outcome = (total >= 11) ? 'Tai' : 'Xiu';
+                
                 history.push(outcome);
                 const bar = document.getElementById('history-bar');
                 bar.innerHTML = '';
@@ -175,6 +193,7 @@
                     ball.textContent = res === 'Tai' ? 'T' : 'X';
                     bar.appendChild(ball);
                 });
+
                 if (choice !== '') {
                     if (choice === outcome) { syncBalance(balance + betAmount); document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount}</span>`; }
                     else { syncBalance(balance - betAmount); document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount}</span>`; }
@@ -198,7 +217,7 @@
             document.getElementById('btn-tab-nap').style.color = t === 'nap' ? '#ffeb3b' : '#666';
             document.getElementById('btn-tab-rut').style.color = t === 'rut' ? '#ffeb3b' : '#666';
         }
-        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví!"); }
+        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví admin!"); }
         function validateBet() { let input = document.getElementById('bet-amount'); let val = parseFloat(input.value) || 0; if (val > balance) { val = balance; input.value = val; } betAmount = val; }
         function setMaxBet() { document.getElementById('bet-amount').value = balance; validateBet(); }
         function selectChoice(c) { if (balance <= 0) return; choice = c; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); document.getElementById('btn-' + c.toLowerCase()).classList.add('active'); }
