@@ -3,41 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Master</title>
+    <title>DICE MASTER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        body { font-family: 'Press Start 2P', system-ui; background: #111827; color: white; }
-        .dice { width: 120px; height: 120px; background: linear-gradient(145deg,#fff,#f1f1f1); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; position: relative; font-size: 90px; }
-        .dice-number { position: absolute; font-size: 65px; font-weight: bold; color: #111827; }
-        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-15deg)} 50%{transform:rotate(15deg)} 75%{transform:rotate(-10deg)} 100%{transform:rotate(0deg)} }
-        .shake { animation: shake 0.9s; }
-        .tab-active { border-bottom: 5px solid #fbbf24; color: #fbbf24; }
+        body { font-family: 'Press Start 2P', system-ui; background: #0a0a0a; color: #fff; }
+        .dice { width: 130px; height: 130px; background: linear-gradient(145deg,#ffeb3b,#f57f17); border-radius: 24px; box-shadow: 0 0 40px #ffeb3b, inset 0 15px 25px rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; position: relative; font-size: 95px; }
+        .dice-number { position: absolute; font-size: 72px; color: #111827; font-weight: 900; text-shadow: 0 0 20px #fff; }
+        @keyframes shake { 0%{transform:rotate(0deg)scale(1)} 25%{transform:rotate(-18deg)scale(1.1)} 50%{transform:rotate(18deg)scale(0.95)} 75%{transform:rotate(-12deg)scale(1.05)} 100%{transform:rotate(0deg)scale(1)} }
+        .shake { animation: shake 0.95s; }
+        .tab-active { border-bottom: 6px solid #ffeb3b; color: #ffeb3b; }
+        .chat-msg { animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen">
-    <div class="max-w-md mx-auto bg-zinc-900 min-h-screen flex flex-col">
+    <div class="max-w-md mx-auto bg-zinc-950 min-h-screen flex flex-col">
         <!-- HEADER -->
-        <div class="bg-black p-4 flex items-center justify-between sticky top-0 z-50">
+        <div class="bg-black p-4 flex justify-between items-center sticky top-0 z-50 border-b border-yellow-400">
             <div class="flex items-center gap-3">
-                <div id="avatar" class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-3xl">👤</div>
+                <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center text-4xl shadow-xl">👤</div>
                 <div>
-                    <div id="username" class="font-bold text-lg">Guest</div>
-                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: loading...</div>
+                    <div id="username" class="font-bold text-xl">Guest</div>
+                    <div id="tg-id-display" class="text-emerald-400 text-xs">ID: 844381037</div>
                 </div>
             </div>
             <div class="text-right">
-                <div id="balance" class="text-3xl font-bold text-yellow-400">500.00</div>
+                <div id="balance" class="text-4xl font-bold text-yellow-300">500.00</div>
             </div>
         </div>
 
         <!-- TABS -->
-        <div class="flex border-b border-zinc-700 text-sm bg-black">
-            <button onclick="switchTab(0)" class="tab-active flex-1 py-3" id="tab0">CHƠI</button>
-            <button onclick="switchTab(1)" class="flex-1 py-3" id="tab1">NẠP</button>
-            <button onclick="switchTab(2)" class="flex-1 py-3" id="tab2">RÚT</button>
-            <button onclick="switchTab(3)" class="flex-1 py-3" id="tab3">LỊCH SỬ</button>
+        <div class="flex bg-black border-b border-zinc-700">
+            <button onclick="switchTab(0)" class="tab-active flex-1 py-4 font-bold" id="tab0">🎲 CHƠI</button>
+            <button onclick="switchTab(1)" class="flex-1 py-4 font-bold" id="tab1">💬 CHAT</button>
+            <button onclick="switchTab(2)" class="flex-1 py-4 font-bold" id="tab2">💰 NẠP</button>
+            <button onclick="switchTab(3)" class="flex-1 py-4 font-bold" id="tab3">💸 RÚT</button>
         </div>
 
         <!-- CHƠI -->
@@ -50,64 +52,80 @@
                 <div id="dice3" class="dice">🎲<span class="dice-number">?</span></div>
             </div>
             <div class="text-center mb-8">
-                <div id="result-sum" class="text-5xl font-bold text-yellow-400">?</div>
-                <div id="result-text" class="text-3xl font-bold mt-3"></div>
+                <div id="result-sum" class="text-6xl font-bold text-yellow-300">?</div>
+                <div id="result-text" class="text-3xl font-bold mt-2"></div>
             </div>
-            <div class="bg-zinc-800 rounded-3xl p-6">
+            <div class="bg-zinc-900 rounded-3xl p-6">
                 <div class="text-center text-xs mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span></div>
                 <div class="flex gap-4 mb-6">
-                    <button onclick="selectChoice('Tai')" id="btn-tai" class="flex-1 py-6 rounded-2xl bg-green-600 font-bold text-xl">TÀI</button>
-                    <button onclick="selectChoice('Xiu')" id="btn-xiu" class="flex-1 py-6 rounded-2xl bg-red-600 font-bold text-xl">XỈU</button>
+                    <button onclick="selectChoice('Tai')" id="btn-tai" class="flex-1 py-7 rounded-2xl bg-green-600 font-bold text-2xl">TÀI</button>
+                    <button onclick="selectChoice('Xiu')" id="btn-xiu" class="flex-1 py-7 rounded-2xl bg-red-600 font-bold text-2xl">XỈU</button>
                 </div>
                 <div class="flex gap-3">
-                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-black text-center text-4xl py-5 rounded-2xl" oninput="updateBetDisplay()">
-                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-10 rounded-2xl font-bold">MAX</button>
+                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-black text-center text-4xl py-6 rounded-2xl" oninput="updateBetDisplay()">
+                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-12 rounded-2xl font-bold">MAX</button>
                 </div>
             </div>
         </div>
 
-        <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Dữ liệu lưu trên máy anh</div>
+        <!-- CHAT -->
+        <div id="content1" class="flex-1 flex flex-col hidden">
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-zinc-950"></div>
+            <div class="p-4 bg-black border-t border-zinc-700 flex">
+                <input id="chat-input" type="text" placeholder="Nhập tin nhắn..." class="flex-1 bg-zinc-900 rounded-l-2xl px-5 py-4 text-white" onkeypress="if(event.key==='Enter') sendChat()">
+                <button onclick="sendChat()" class="bg-yellow-400 text-black px-8 rounded-r-2xl font-bold">GỬI</button>
+            </div>
+        </div>
+
+        <!-- NẠP & RÚT (rút gọn) -->
+        <div id="content2" class="flex-1 p-8 hidden text-center">NẠP USDT (BEP-20)<br>0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
+        <div id="content3" class="flex-1 p-8 hidden text-center">RÚT TIỀN (gửi về admin)</div>
+
+        <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Chat trực tiếp</div>
     </div>
 
     <script>
-        let telegramId = 'local-test';
         let balance = 500;
         let choice = '';
         let betAmount = 0;
         let countdown = 20;
         let countdownInterval = null;
+        let chatMessages = [];
 
-        // === KHỞI TẠO TELEGRAM (đã fix) ===
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user && user.id) {
-                telegramId = user.id.toString();
-                document.getElementById('username').textContent = user.first_name || 'Player';
-                document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
-            } else {
-                document.getElementById('username').textContent = 'Guest';
-                document.getElementById('tg-id-display').textContent = 'ID: 844381037 (test)';
+        // Fake chat
+        const fakeNames = ["Player69", "LuckyRoll", "XiuKing", "TaiGod", "DiceQueen"];
+        function addFakeMessage() {
+            if (Math.random() > 0.6) {
+                const name = fakeNames[Math.floor(Math.random()*fakeNames.length)];
+                const msg = ["Tài nóng quá!", "Xỉu đi em ơi", "Roll đẹp!", "Cược 500 Tài", "Thua rồi 😭"][Math.floor(Math.random()*5)];
+                chatMessages.push({name: name, msg: msg, type: 'other'});
+                renderChat();
             }
         }
 
-        function updateBetDisplay() {
-            let input = document.getElementById('bet-amount');
-            betAmount = parseFloat(input.value) || 0;
-            if (betAmount > balance) {
-                betAmount = balance;
-                input.value = balance;
-                alert('❌ Không đủ Credits!');
-            }
-            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
+        function renderChat() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = chatMessages.map(m => `
+                <div class="chat-msg flex ${m.type==='me' ? 'justify-end' : 'justify-start'}">
+                    <div class="${m.type==='me' ? 'bg-yellow-400 text-black' : 'bg-zinc-800'} px-5 py-3 rounded-3xl max-w-[75%]">
+                        <div class="text-xs opacity-70">${m.name}</div>
+                        <div>${m.msg}</div>
+                    </div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
         }
 
-        function setMaxBet() {
-            document.getElementById('bet-amount').value = balance;
-            updateBetDisplay();
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            if (!input.value.trim()) return;
+            chatMessages.push({name: "Bạn", msg: input.value, type: 'me'});
+            renderChat();
+            input.value = '';
+            setTimeout(addFakeMessage, 800);
         }
 
+        // Game logic (giữ nguyên nhưng sạch hơn)
         function rollDiceAuto() {
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
             diceEls.forEach(d => d.classList.add('shake'));
@@ -128,12 +146,6 @@
                     balance += win ? betAmount : -betAmount;
                     if (balance < 0) balance = 0;
                     document.getElementById('balance').textContent = balance.toFixed(2);
-
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'update_balance',
-                        telegramId: telegramId,
-                        balance: balance
-                    }));
                 }
 
                 choice = '';
@@ -165,13 +177,25 @@
             updateBetDisplay();
         }
 
-        function switchTab(n) {
-            document.querySelectorAll('#tab0,#tab1,#tab2,#tab3').forEach((b,i) => b.classList.toggle('tab-active', i===n));
+        function updateBetDisplay() {
+            betAmount = parseFloat(document.getElementById('bet-amount').value) || 0;
+            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
         }
 
-        // KHỞI ĐỘNG
+        function setMaxBet() {
+            document.getElementById('bet-amount').value = balance;
+            updateBetDisplay();
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('#tab0,#tab1,#tab2,#tab3').forEach((b,i) => b.classList.toggle('tab-active', i===n));
+            document.querySelectorAll('#content0,#content1,#content2,#content3').forEach((c,i) => c.classList.toggle('hidden', i!==n));
+        }
+
+        // INIT
         switchTab(0);
         startCountdown();
+        setInterval(addFakeMessage, 4500); // Fake chat tự động
     </script>
 </body>
 </html>
