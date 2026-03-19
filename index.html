@@ -191,7 +191,13 @@
         }
 
         function updateBetDisplay() {
-            betAmount = parseFloat(document.getElementById('bet-amount').value) || 0;
+            let input = document.getElementById('bet-amount');
+            betAmount = parseFloat(input.value) || 0;
+            if (betAmount > balance) {
+                betAmount = balance;
+                input.value = balance;
+                alert('Không thể đặt cược quá số dư!');
+            }
             document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
             document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
         }
