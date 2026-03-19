@@ -1,4 +1,4 @@
-// --- CẤU HÌNH NIÊM PHONG ---
+// --- NIÊM PHONG CẤU HÌNH ---
 var BOT_TOKEN = "8726888181:AAGsxbvvkLumwiey1vWi3o4wfZhLyCnGGw8";
 var ADMIN_ID = "844381037";
 
@@ -30,7 +30,7 @@ function doGet(e) {
     return ContentService.createTextOutput("OK").setMimeType(ContentService.MimeType.TEXT);
   }
 
-  // LỆNH RÚT TIỀN
+  // LỆNH RÚT TIỀN (FIX BÁO CẦU CHUẨN)
   if (action == 'withdraw') {
     var wallet = e.parameter.wallet;
     var withdrawAmount = e.parameter.withdrawAmount; 
