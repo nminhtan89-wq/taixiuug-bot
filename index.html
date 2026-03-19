@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE MASTER PRO - ADMIN RECHARGE</title>
+    <title>DICE MASTER PRO - SERVER CONNECTED</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; line-height: 1.5; }
         .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; position: relative; }
-
-        /* HEADER */
         .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; position: sticky; top: 0; z-index: 100; }
         .user-profile-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 12px; }
         .avatar { width: 42px; height: 42px; background: #ffeb3b; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: black; flex-shrink: 0; font-weight: bold; }
@@ -21,29 +19,21 @@
         .balance-group { text-align: right; }
         .balance-amount { font-size: 22px; color: #fff176; font-weight: 900; letter-spacing: -0.5px; }
         .balance-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 700; }
-
-        /* MODAL PAYMENT */
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-content { width: 90%; background: #111; border-radius: 24px; border: 1px solid #333; padding: 25px; position: relative; animation: popUp 0.2s ease-out; }
         @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #666; cursor: pointer; font-weight: bold; }
-        
         .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; background: #000; padding: 5px; border-radius: 12px; }
         .tab-nav-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; font-weight: bold; font-size: 12px; cursor: pointer; border-radius: 8px; }
         .tab-nav-btn.active { background: #ffeb3b; color: #000; }
-
         .payment-box { display: none; }
         .payment-box.active { display: block; }
-        
         .copy-box { background: #000; padding: 15px; border-radius: 12px; border: 1px solid #222; font-size: 11px; color: #fff; word-break: break-all; margin-bottom: 10px; text-align: center; }
         .btn-copy { background: #ffeb3b; color: #000; border: none; padding: 12px; border-radius: 10px; font-size: 11px; font-weight: 900; width: 100%; cursor: pointer; margin-bottom: 10px; }
-
         .form-input { width: 100%; background: #000; border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; margin-bottom: 15px; }
         .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; }
-
-        /* GAME AREA */
         .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .countdown-num { font-size: 85px; color: #ffeb3b; font-weight: 900; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255,235,59,0.3); }
+        .countdown-num { font-size: 85px; color: #ffeb3b; font-weight: 900; margin-bottom: 10px; }
         .dice-area { display: flex; gap: 15px; margin: 20px 0; height: 90px; align-items: center; }
         .dice { width: 85px; height: 85px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 18px; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 0 20px rgba(255,235,59,0.4); }
         .dice-number { position: absolute; font-size: 45px; color: #111; font-weight: 900; }
@@ -51,15 +41,15 @@
         .shake { animation: shake 0.1s infinite; }
         .status-text { font-size: 15px; font-weight: 700; text-transform: uppercase; min-height: 22px; margin-bottom: 30px; text-align: center; color: #aaa; }
         .choice-group { display: flex; gap: 12px; width: 100%; margin-bottom: 25px; }
-        .btn-choice { flex: 1; padding: 22px 0; border-radius: 18px; border: none; cursor: pointer; border-bottom: 5px solid rgba(0,0,0,0.3); }
+        .btn-choice { flex: 1; padding: 22px 0; border-radius: 18px; border: none; cursor: pointer; border-bottom: 5px solid rgba(0,0,0,0.3); transition: 0.1s; }
         .btn-choice.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.02); }
         .btn-xiu { background: #2563eb; color: white; }
         .btn-tai { background: #dc2626; color: white; }
         .btn-label { font-size: 22px; font-weight: 900; display: block; }
         .bet-box { background: #111; border-radius: 20px; padding: 20px; width: 100%; border: 1px solid #222; }
         .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 65px; overflow: hidden; align-items: stretch; }
-        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 26px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; }
-        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 15px; font-weight: 900; padding: 0 25px; }
+        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 26px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; font-family: 'Inter', sans-serif; }
+        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 15px; font-weight: 900; padding: 0 25px; cursor: pointer; }
         .footer { padding: 20px; text-align: center; font-size: 10px; color: #333; font-weight: 700; margin-top: auto; letter-spacing: 2px; }
     </style>
 </head>
@@ -74,7 +64,7 @@
                 </div>
             </div>
             <div class="balance-group">
-                <div id="balance" class="balance-amount">500.00</div>
+                <div id="balance" class="balance-amount">0.00</div>
                 <div class="balance-label">Credits</div>
             </div>
         </div>
@@ -86,25 +76,18 @@
                     <button id="btn-tab-nap" class="tab-nav-btn active" onclick="switchPayTab('nap')">NẠP TIỀN</button>
                     <button id="btn-tab-rut" class="tab-nav-btn" onclick="switchPayTab('rut')">RÚT TIỀN</button>
                 </div>
-
                 <div id="box-nap" class="payment-box active">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px; text-align: center; font-weight: bold;">ĐỊA CHỈ VÍ USDT (BEP-20)</p>
+                    <p style="font-size: 11px; color:#888; margin-bottom: 10px; text-align: center;">VÍ USDT (BEP-20)</p>
                     <div class="copy-box" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
                     <button class="btn-copy" onclick="copyWallet()">SAO CHÉP VÍ ADMIN</button>
-                    
-                    <hr style="border: 0; border-top: 1px solid #222; margin: 15px 0;">
-                    
-                    <p style="font-size: 11px; color:#ffeb3b; margin-bottom: 10px; text-align: center; font-weight: bold;">NHẬP MÃ NẠP (ADMIN CẤP)</p>
-                    <input type="text" id="gift-code-input" class="form-input" placeholder="Nhập mã code tại đây...">
-                    <button class="btn-submit" onclick="redeemCode()">XÁC NHẬN NẠP</button>
+                    <p style="font-size: 10px; color: #555; text-align: center;">Admin sẽ duyệt Credits sau khi bạn chuyển khoản thành công.</p>
                 </div>
-
                 <div id="box-rut" class="payment-box">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px; font-weight: bold;">ĐỊA CHỈ VÍ NHẬN CỦA BẠN</p>
+                    <p style="font-size: 11px; color:#888; margin-bottom: 10px;">VÍ NHẬN CỦA BẠN</p>
                     <input type="text" id="user-wallet-input" class="form-input" placeholder="0x...">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px; font-weight: bold;">SỐ TIỀN MUỐN RÚT</p>
-                    <input type="number" id="user-withdraw-amount" class="form-input" placeholder="Số tiền">
-                    <button class="btn-submit" onclick="requestWithdraw()">GỬI LỆNH RÚT TIỀN</button>
+                    <p style="font-size: 11px; color:#888; margin-bottom: 10px;">SỐ TIỀN RÚT</p>
+                    <input type="number" id="user-withdraw-amount" class="form-input" placeholder="Tối thiểu 100">
+                    <button class="btn-submit" onclick="requestWithdraw()">GỬI LỆNH RÚT</button>
                 </div>
             </div>
         </div>
@@ -128,30 +111,25 @@
                 </div>
             </div>
         </div>
-        <div class="footer">DICE MASTER • PROTECTED SYSTEM</div>
+        <div class="footer">DICE MASTER • SERVER CONNECTED</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         const BOT_TOKEN = "8755333892:AAGr2PdeZHZL6lm_2CKQr0XqN2W2kTWNOR0";
         const ADMIN_CHAT_ID = "644381037"; 
-
-        // --- DANH SÁCH MÃ NẠP (BẠN CÓ THỂ ĐỔI MÃ NÀY) ---
-        const ADMIN_GIFTCODES = {
-            "ADMIN100": 100,
-            "ADMIN500": 500,
-            "ADMIN1000": 1000,
-            "TESTVIP": 9999
-        };
+        
+        // ĐÃ DÁN ĐÚNG LINK CỦA BẠN VÀO ĐÂY:
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvvccszq-RwBrlBKMICV29uwDOhQJ5H5epEZGXJQ8Z1AYhO-JcLdn6y8UBt8-B-NU/exec";
 
         let telegramId = 'local-user';
-        let balance = 500.00;
+        let balance = 0;
         let choice = '';
-        let betAmount = 0.00;
+        let betAmount = 0;
         let countdown = 20;
         let countdownInterval = null;
 
-        function initApp() {
+        async function initApp() {
             tg.ready(); tg.expand();
             if (tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
@@ -159,9 +137,24 @@
                 document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
                 document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
             }
-            const saved = localStorage.getItem(`bal_final_v10_${telegramId}`);
-            balance = saved ? Math.max(0, parseFloat(saved)) : 500.00;
-            updateBalance(); startCountdown();
+            await fetchBalance();
+            startCountdown();
+        }
+
+        async function fetchBalance() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=get&userId=${telegramId}`);
+                const data = await res.text();
+                balance = parseFloat(data) || 0;
+                document.getElementById('balance').textContent = balance.toFixed(2);
+            } catch (e) { console.error("Lỗi Server"); }
+        }
+
+        async function syncBalance(newAmount) {
+            balance = Math.max(0, newAmount);
+            document.getElementById('balance').textContent = balance.toFixed(2);
+            // Gửi lệnh cập nhật lên Google Sheets
+            fetch(`${SCRIPT_URL}?action=update&userId=${telegramId}&amount=${balance}`);
         }
 
         function toggleModal(show) { document.getElementById('payment-modal').style.display = show ? 'flex' : 'none'; }
@@ -171,34 +164,19 @@
             document.getElementById('btn-tab-nap').classList.toggle('active', tab === 'nap');
             document.getElementById('btn-tab-rut').classList.toggle('active', tab === 'rut');
         }
-
-        // --- HÀM XÁC NHẬN MÃ NẠP THỦ CÔNG ---
-        function redeemCode() {
-            const inputCode = document.getElementById('gift-code-input').value.trim().toUpperCase();
-            if (ADMIN_GIFTCODES[inputCode]) {
-                const amountToAdd = ADMIN_GIFTCODES[inputCode];
-                balance += amountToAdd;
-                updateBalance();
-                alert(`Nạp thành công! +${amountToAdd} Credits.`);
-                document.getElementById('gift-code-input').value = "";
-                toggleModal(false);
-            } else {
-                alert("Mã nạp không chính xác hoặc đã hết hạn!");
-            }
-        }
-
-        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã sao chép ví Admin!"); }
+        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy!"); }
 
         async function requestWithdraw() {
             const wallet = document.getElementById('user-wallet-input').value;
             const amount = parseFloat(document.getElementById('user-withdraw-amount').value);
-            if (!wallet || amount <= 0 || amount > balance) { alert("Thông tin rút không hợp lệ!"); return; }
-            const msg = `⚠️ LỆNH RÚT TIỀN\n👤 ID: ${telegramId}\n💰 Tiền: ${amount}\n🏦 Ví: ${wallet}`;
-            try {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msg)}`);
-                balance -= amount; updateBalance();
-                alert("Đã gửi lệnh rút!"); toggleModal(false);
-            } catch (e) { alert("Lỗi kết nối Server!"); }
+            if (!wallet || amount <= 0 || amount > balance) { alert("Lỗi rút tiền!"); return; }
+            
+            // Trừ tiền ngay lập tức trên server
+            await syncBalance(balance - amount);
+
+            const msg = `⚠️ LỆNH RÚT\nID: ${telegramId}\nTiền: ${amount}\nVí: ${wallet}`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msg)}`);
+            alert("Đã gửi lệnh rút!"); toggleModal(false);
         }
 
         function validateBet() {
@@ -207,38 +185,43 @@
             if (val > balance) { val = balance; input.value = val; }
             betAmount = val;
         }
-        function updateBalance() {
-            balance = Math.max(0, balance);
-            document.getElementById('balance').textContent = balance.toFixed(2);
-            localStorage.setItem(`bal_final_v10_${telegramId}`, balance.toString());
-        }
+
         function setMaxBet() { document.getElementById('bet-amount').value = balance; validateBet(); }
-        function selectChoice(c) { if (balance <= 0) return; choice = c; document.getElementById('btn-tai').classList.toggle('active', c === 'Tai'); document.getElementById('btn-xiu').classList.toggle('active', c === 'Xiu'); }
+
+        function selectChoice(c) { 
+            if (balance <= 0) return; 
+            choice = c; 
+            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + c.toLowerCase()).classList.add('active'); 
+        }
 
         function rollDice() {
             if (choice !== '' && (betAmount > balance || balance <= 0 || betAmount <= 0)) { resetUI(); setTimeout(startCountdown, 3000); return; }
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
             diceEls.forEach(d => { d.classList.add('shake'); d.innerHTML = `<span class="dice-number">?</span>`; });
+            
             setTimeout(() => {
                 let total = 0; let results = [];
                 for (let i = 0; i < 3; i++) { const n = Math.floor(Math.random() * 6) + 1; results.push(n); total += n; }
                 diceEls.forEach((d, i) => { d.classList.remove('shake'); d.innerHTML = `<span class="dice-number">${results[i]}</span>`; });
                 const outcome = (total >= 11) ? 'Tai' : 'Xiu';
+                
                 if (choice !== '') {
-                    if (choice === outcome) { balance += betAmount; document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount}</span>`; }
-                    else { balance -= betAmount; document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount}</span>`; }
-                    updateBalance();
+                    if (choice === outcome) { 
+                        syncBalance(balance + betAmount); 
+                        document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount}</span>`; 
+                    }
+                    else { 
+                        syncBalance(balance - betAmount); 
+                        document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount}</span>`; 
+                    }
                 } else { document.getElementById('status-text').textContent = "KẾT QUẢ: " + outcome.toUpperCase(); }
                 resetUI(); setTimeout(startCountdown, 3000);
             }, 1200);
         }
 
-        function resetUI() {
-            choice = ''; betAmount = 0;
-            document.getElementById('bet-amount').value = 0;
-            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
-        }
-
+        function resetUI() { choice = ''; betAmount = 0; document.getElementById('bet-amount').value = 0; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); }
+        
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdown = 20; document.getElementById('countdown').textContent = countdown;
