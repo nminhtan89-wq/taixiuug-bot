@@ -53,17 +53,13 @@
             </div>
             <div class="bg-zinc-900 rounded-3xl p-6">
                 <div class="text-center text-sm mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span></div>
-                <div class="flex gap-3">
-                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-black text-center text-4xl py-6 rounded-2xl border border-yellow-400" oninput="updateBetDisplay()">
-                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-10 rounded-2xl font-bold text-xl">MAX</button>
+                <!-- PHẦN INPUT + MAX ĐÃ SÁT NHAU HOÀN TOÀN -->
+                <div class="flex items-center gap-2">
+                    <input id="bet-amount" type="number" value="0" class="flex-1 bg-black text-center text-4xl py-6 rounded-l-3xl border border-yellow-400 focus:outline-none" oninput="updateBetDisplay()">
+                    <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-10 py-6 rounded-r-3xl font-bold text-xl">MAX</button>
                 </div>
             </div>
         </div>
-
-        <!-- Các tab khác (CHAT, NẠP, RÚT) giữ nguyên ngắn gọn -->
-        <div id="content1" class="flex-1 p-6 hidden">💬 CHAT (fake)</div>
-        <div id="content2" class="flex-1 p-6 hidden">💰 NẠP USDT</div>
-        <div id="content3" class="flex-1 p-6 hidden">💸 RÚT TIỀN</div>
 
         <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Balance lưu vĩnh viễn</div>
     </div>
@@ -76,7 +72,6 @@
         let countdown = 20;
         let countdownInterval = null;
 
-        // Load balance từ localStorage
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.ready();
             Telegram.WebApp.expand();
@@ -84,6 +79,7 @@
             if (user && user.id) telegramId = user.id.toString();
         }
         document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+
         const saved = localStorage.getItem(`balance_${telegramId}`);
         if (saved) {
             balance = parseFloat(saved);
@@ -100,7 +96,6 @@
             if (betAmount > balance) {
                 betAmount = balance;
                 input.value = balance;
-                alert('❌ Không đủ Credits!');
             }
             document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
         }
@@ -111,15 +106,34 @@
         }
 
         function rollDiceAuto() {
-            // ... (logic lắc xúc xắc giữ nguyên)
-            // Sau khi roll:
-            if (betAmount >= 10 && choice) {
-                balance += win ? betAmount : -betAmount;
-                if (balance < 0) balance = 0;
-                document.getElementById('balance').textContent = balance.toFixed(2);
-                saveBalance();
-            }
-            startCountdown();
+            const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+            diceEls.forEach(d => d.classList.add('shake'));
+            setTimeout(() => {
+                let total = 0;
+                for (let i = 0; i < 3; i++) {
+                    const num = Math.floor(Math.random() * 6) + 1;
+                    diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
+                    total += num;
+                }
+                diceEls.forEach(d => d.classList.remove('shake'));
+
+                document.getElementById('result-sum').textContent = total;
+                const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
+                document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
+
+                if (betAmount >= 10 && choice) {
+                    balance += win ? betAmount : -betAmount;
+                    if (balance < 0) balance = 0;
+                    document.getElementById('balance').textContent = balance.toFixed(2);
+                    saveBalance();
+                }
+
+                choice = '';
+                betAmount = 0;
+                document.getElementById('bet-amount').value = '0';
+                updateBetDisplay();
+                startCountdown();
+            }, 900);
         }
 
         function startCountdown() {
