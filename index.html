@@ -77,112 +77,113 @@
         <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Dữ liệu gửi về máy tính bạn</div>
     </div>
 
-    <script>
-        let telegramId = 'local-test';
-        let balance = 500;
-        let choice = '';
-        let betAmount = 0;
-        let countdown = 20;
-        let countdownInterval = null;
+   <script>
+    let telegramId = 'local-test';
+    let balance = 500;
+    let choice = '';
+    let betAmount = 0;
+    let countdown = 20;
+    let countdownInterval = null;
 
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user && user.id) {
-                telegramId = user.id.toString();
-                document.getElementById('username').textContent = user.first_name || 'Player';
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        if (user && user.id) {
+            telegramId = user.id.toString();
+            document.getElementById('username').textContent = user.first_name || 'Player';
+            document.getElementById('avatar').textContent = '👤';
+        }
+    }
+    document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+
+    function updateBetDisplay() {
+        let input = document.getElementById('bet-amount');
+        betAmount = parseFloat(input.value) || 0;
+        if (betAmount > balance) {
+            betAmount = balance;
+            input.value = balance;
+            alert('❌ Không đủ Credits!');
+        }
+        document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
+        document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
+    }
+
+    function setMaxBet() {
+        document.getElementById('bet-amount').value = balance;
+        updateBetDisplay();
+    }
+
+    function rollDiceAuto() {
+        const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+        diceEls.forEach(d => d.classList.add('shake'));
+        setTimeout(() => {
+            let total = 0;
+            for (let i = 0; i < 3; i++) {
+                const num = Math.floor(Math.random() * 6) + 1;
+                diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
+                total += num;
             }
-        }
-        document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+            diceEls.forEach(d => d.classList.remove('shake'));
 
-        function updateBetDisplay() {
-            let input = document.getElementById('bet-amount');
-            betAmount = parseFloat(input.value) || 0;
-            if (betAmount > balance) {
-                betAmount = balance;
-                input.value = balance;
-                alert('❌ Không đủ Credits!');
+            document.getElementById('result-sum').textContent = total;
+            const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
+            document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
+
+            if (betAmount >= 10 && choice) {
+                balance += win ? betAmount : -betAmount;
+                if (balance < 0) balance = 0;
+                document.getElementById('balance').textContent = balance.toFixed(2);
+
+                // GỬI DỮ LIỆU VỀ MÁY ANH (đây là cách chuẩn)
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'update_balance',
+                    telegramId: telegramId,
+                    balance: balance
+                }));
             }
-            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
-            document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
-        }
 
-        function setMaxBet() {
-            document.getElementById('bet-amount').value = balance;
+            choice = '';
+            betAmount = 0;
+            document.getElementById('bet-amount').value = '0';
             updateBetDisplay();
-        }
+        }, 900);
+    }
 
-        function rollDiceAuto() {
-            const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-            diceEls.forEach(d => d.classList.add('shake'));
-            setTimeout(() => {
-                let total = 0;
-                for (let i = 0; i < 3; i++) {
-                    const num = Math.floor(Math.random() * 6) + 1;
-                    diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
-                    total += num;
-                }
-                diceEls.forEach(d => d.classList.remove('shake'));
+    function startCountdown() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdown = 20;
+        document.getElementById('countdown').textContent = 20;
+        countdownInterval = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                rollDiceAuto();
+                setTimeout(startCountdown, 1200);
+            }
+        }, 1000);
+    }
 
-                document.getElementById('result-sum').textContent = total;
-                const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
-                document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
+    function selectChoice(c) {
+        choice = c;
+        document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
+        document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
+        updateBetDisplay();
+    }
 
-                if (betAmount >= 10 && choice) {
-                    balance += win ? betAmount : -betAmount;
-                    if (balance < 0) balance = 0;
-                    document.getElementById('balance').textContent = balance.toFixed(2);
+    function copyAddress() {
+        navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
+        alert('✅ Đã copy địa chỉ ví!');
+    }
 
-                    // GỬI DỮ LIỆU VỀ MÁY TÍNH CỦA ANH
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'update_balance',
-                        telegramId: telegramId,
-                        balance: balance
-                    }));
-                }
+    function switchTab(n) {
+        document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('tab-active', i===n));
+        document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
+    }
 
-                choice = '';
-                betAmount = 0;
-                document.getElementById('bet-amount').value = '0';
-                updateBetDisplay();
-            }, 900);
-        }
-
-        function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdown = 20;
-            document.getElementById('countdown').textContent = 20;
-            countdownInterval = setInterval(() => {
-                countdown--;
-                document.getElementById('countdown').textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    rollDiceAuto();
-                    setTimeout(startCountdown, 1200);
-                }
-            }, 1000);
-        }
-
-        function selectChoice(c) {
-            choice = c;
-            document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
-            document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
-            updateBetDisplay();
-        }
-
-        function copyAddress() {
-            navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
-            alert('✅ Đã copy địa chỉ ví!');
-        }
-
-        function switchTab(n) {
-            document.querySelectorAll('#tab0,#tab1,#tab2,#tab3').forEach((b,i) => b.classList.toggle('tab-active', i===n));
-            document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
-        }
-
-        switchTab(0);
-        startCountdown();
-    </script>
+    switchTab(0);
+    startCountdown();
+</script>
 </body>
 </html>
