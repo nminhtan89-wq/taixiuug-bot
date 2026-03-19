@@ -9,8 +9,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         body { font-family: 'Press Start 2P', system-ui; background: #111827; color: white; }
-        .dice { width: 120px; height: 120px; background: linear-gradient(145deg,#fff,#f1f1f1); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 8px 15px rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; position: relative; font-size: 85px; }
-        .dice-number { position: absolute; font-size: 62px; font-weight: bold; color: #111827; text-shadow: 0 0 15px #fbbf24; z-index: 10; }
+        .dice { width: 120px; height: 120px; background: linear-gradient(145deg,#fff,#f1f1f1); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; position: relative; font-size: 90px; }
+        .dice-number { position: absolute; font-size: 65px; font-weight: bold; color: #111827; }
         @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-15deg)} 50%{transform:rotate(15deg)} 75%{transform:rotate(-10deg)} 100%{transform:rotate(0deg)} }
         .shake { animation: shake 0.9s; }
         .tab-active { border-bottom: 5px solid #fbbf24; color: #fbbf24; }
@@ -23,18 +23,17 @@
             <div class="flex items-center gap-3">
                 <div id="avatar" class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-3xl">👤</div>
                 <div>
-                    <div id="username" class="font-bold">Guest</div>
+                    <div id="username" class="font-bold text-lg">Guest</div>
                     <div id="tg-id-display" class="text-emerald-400 text-xs">ID: loading...</div>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-yellow-400 text-3xl font-bold" id="balance">500.00</div>
-                <div class="text-xs text-zinc-400">CREDITS</div>
+                <div id="balance" class="text-3xl font-bold text-yellow-400">500.00</div>
             </div>
         </div>
 
         <!-- TABS -->
-        <div class="flex border-b border-zinc-700 text-sm">
+        <div class="flex border-b border-zinc-700 text-sm bg-black">
             <button onclick="switchTab(0)" class="tab-active flex-1 py-3" id="tab0">CHƠI</button>
             <button onclick="switchTab(1)" class="flex-1 py-3" id="tab1">NẠP</button>
             <button onclick="switchTab(2)" class="flex-1 py-3" id="tab2">RÚT</button>
@@ -67,11 +66,6 @@
             </div>
         </div>
 
-        <!-- NẠP, RÚT, LỊCH SỬ (đã rút gọn) -->
-        <div id="content1" class="flex-1 p-6 hidden text-center">NẠP USDT (BEP-20)<br>0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
-        <div id="content2" class="flex-1 p-6 hidden">RÚT (sẽ gửi về bot)</div>
-        <div id="content3" class="flex-1 p-6 hidden">LỊCH SỬ (sẽ hiển thị)</div>
-
         <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Dữ liệu lưu trên máy anh</div>
     </div>
 
@@ -83,13 +77,20 @@
         let countdown = 20;
         let countdownInterval = null;
 
+        // === KHỞI TẠO TELEGRAM (đã fix) ===
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.ready();
             Telegram.WebApp.expand();
             const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user && user.id) telegramId = user.id.toString();
+            if (user && user.id) {
+                telegramId = user.id.toString();
+                document.getElementById('username').textContent = user.first_name || 'Player';
+                document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+            } else {
+                document.getElementById('username').textContent = 'Guest';
+                document.getElementById('tg-id-display').textContent = 'ID: 844381037 (test)';
+            }
         }
-        document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
 
         function updateBetDisplay() {
             let input = document.getElementById('bet-amount');
@@ -166,9 +167,9 @@
 
         function switchTab(n) {
             document.querySelectorAll('#tab0,#tab1,#tab2,#tab3').forEach((b,i) => b.classList.toggle('tab-active', i===n));
-            document.querySelectorAll('#content0,#content1,#content2,#content3').forEach((c,i) => c.classList.toggle('hidden', i!==n));
         }
 
+        // KHỞI ĐỘNG
         switchTab(0);
         startCountdown();
     </script>
