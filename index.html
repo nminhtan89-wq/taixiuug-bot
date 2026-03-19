@@ -53,13 +53,18 @@
             </div>
             <div class="bg-zinc-900 rounded-3xl p-6">
                 <div class="text-center text-sm mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span></div>
-                <!-- PHẦN INPUT + MAX ĐÃ SÁT NHAU HOÀN TOÀN -->
-                <div class="flex items-center gap-2">
+                <!-- INPUT + MAX SÁT NHAU HOÀN TOÀN -->
+                <div class="flex items-center gap-1">
                     <input id="bet-amount" type="number" value="0" class="flex-1 bg-black text-center text-4xl py-6 rounded-l-3xl border border-yellow-400 focus:outline-none" oninput="updateBetDisplay()">
                     <button onclick="setMaxBet()" class="bg-yellow-400 text-black px-10 py-6 rounded-r-3xl font-bold text-xl">MAX</button>
                 </div>
             </div>
         </div>
+
+        <!-- Các tab khác (đơn giản) -->
+        <div id="content1" class="flex-1 p-6 hidden text-center">💬 CHAT</div>
+        <div id="content2" class="flex-1 p-6 hidden text-center">💰 NẠP USDT</div>
+        <div id="content3" class="flex-1 p-6 hidden text-center">💸 RÚT TIỀN</div>
 
         <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Balance lưu vĩnh viễn</div>
     </div>
