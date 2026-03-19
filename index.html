@@ -6,119 +6,115 @@
     <title>DICE MASTER - TÀI XỈU</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Nhúng phông chữ Pixel trực tiếp */
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
-        /* Reset CSS cơ bản để chống lỗi trên điện thoại */
+        /* Reset chuẩn để chống vỡ layout trên Mobile */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Press Start 2P', cursive; background: #0a0a0a; color: white; overflow-x: hidden; font-size: 10px; }
 
-        /* Container chính co giãn theo màn hình */
-        .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; flex-direction: column; display: flex; border-x: 1px solid #222; }
+        .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-left: 1px solid #222; border-right: 1px solid #222; }
 
-        /* HEADER & BALANCE */
-        .header { background: black; padding: 15px; flex-direction: row; display: flex; justify-content: space-between; align-items: center; sticky: top; z-index: 50; border-bottom: 2px solid #ffeb3b; }
-        .user-info { flex-direction: row; display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; background: #ffeb3b; border-radius: 50%; justify-content: center; align-items: center; display: flex; font-size: 24px; color: black; }
-        .username { font-weight: bold; font-size: 9px; color: white; }
-        .tg-id { font-size: 7px; color: #4ae3b5; margin-top: 3px; }
+        /* HEADER */
+        .header { background: black; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; position: sticky; top: 0; z-index: 100; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; background: #ffeb3b; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; color: black; }
+        .username { font-size: 8px; font-weight: bold; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+        .tg-id { font-size: 7px; color: #4ae3b5; margin-top: 4px; }
         .balance-group { text-align: right; }
-        .balance-amount { font-size: 20px; font-weight: bold; color: #fff176; }
-        .balance-label { font-size: 7px; color: #888; margin-top: 2px; }
+        .balance-amount { font-size: 18px; color: #fff176; font-weight: bold; }
+        .balance-label { font-size: 6px; color: #666; margin-top: 2px; }
 
         /* TABS */
-        .tabs { background: black; flex-direction: row; display: flex; border-bottom: 1px solid #333; sticky: top; top: 72px; z-index: 40; }
-        .tab-btn { flex: 1; padding: 15px 0; background: transparent; border: none; color: #888; font-family: 'Press Start 2P', cursive; font-size: 9px; cursor: pointer; text-align: center; }
+        .tabs { display: flex; background: #000; border-bottom: 1px solid #222; }
+        .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; color: #555; font-family: 'Press Start 2P', cursive; font-size: 8px; cursor: pointer; }
         .tab-btn.active { color: #ffeb3b; border-bottom: 3px solid #ffeb3b; }
 
-        /* GAME CONTENT CONTAINER */
-        .game-content { padding: 20px; flex: 1; flex-direction: column; display: flex; align-items: center; }
-
-        /* COUNTDOWN & TEXT */
-        .label-text { font-size: 8px; color: #ffeb3b; text-align: center; letter-spacing: 1px; }
-        .countdown-num { font-size: 70px; font-weight: bold; color: #ffeb3b; text-align: center; margin: 15px 0; }
-        .status-text { text-align: center; font-size: 10px; min-height: 15px; color: white; text-transform: uppercase; margin-top: 10px;}
-
-        /* DICE AREA */
-        .dice-area { flex-direction: row; display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; height: 90px; align-items: center;}
-        .dice { width: 80px; height: 80px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 15px; box-shadow: 0 0 20px rgba(255, 235, 59, 0.5); justify-content: center; align-items: center; display: flex; position: relative; }
-        .dice-number { position: absolute; font-size: 40px; color: #111; font-weight: 900; }
+        /* GAME AREA */
+        .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .countdown-label { font-size: 8px; color: #ffeb3b; margin-top: 10px; }
+        .countdown-num { font-size: 60px; color: #ffeb3b; margin: 15px 0; }
         
-        /* Hiệu ứng rung */
-        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-15deg)} 50%{transform:rotate(15deg)} 75%{transform:rotate(-10deg)} 100%{transform:rotate(0deg)} }
-        .shake { animation: shake 0.2s infinite; }
-
-        /* TÀI XỈU BUTTONS */
-        .choice-group { flex-direction: row; display: flex; gap: 10px; width: 100%; margin-bottom: 20px; }
-        .btn-choice { flex: 1; padding: 20px 0; border-radius: 15px; border: none; font-family: 'Press Start 2P', cursive; cursor: pointer; border-bottom: 5px solid rgba(0,0,0,0.2); transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-        .btn-choice:active { transform: translateY(3px); border-bottom-width: 2px; }
-        .btn-choice.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.03); }
-        .btn-choice .main-label { font-size: 16px; font-weight: bold; color: white; }
-        .btn-choice .sub-label { font-size: 8px; color: rgba(255,255,255,0.7); margin-top: 5px; }
-
-        .btn-xiu { background: #1e88e5; } /* Màu xanh Xỉu */
-        .btn-tai { background: #e53935; } /* Màu đỏ Tài */
-
-        /* PHẦN CƯỢC (ĐÃ FIX LỖI MOBILE) */
-        .bet-box { background: #151515; border-radius: 20px; padding: 15px; width: 100%; border: 1px solid #222; }
-        .bet-header { flex-direction: row; display: flex; justify-content: space-between; font-size: 8px; color: #888; margin-bottom: 10px; text-transform: uppercase; padding: 0 5px;}
-        .bet-current { color: #fff176; font-weight: bold; }
-
-        /* Input Group đã fix */
-        .bet-input-group { flex-direction: row; display: flex; align-items: stretch; background: black; border-radius: 15px; border: 2px solid #fff176; overflow: hidden; }
+        .dice-area { display: flex; gap: 12px; margin-bottom: 20px; height: 85px; align-items: center; }
+        .dice { width: 75px; height: 75px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 12px; box-shadow: 0 0 15px rgba(255, 235, 59, 0.4); display: flex; justify-content: center; align-items: center; position: relative; }
+        .dice-number { position: absolute; font-size: 36px; color: #111; font-weight: 900; }
         
-        /* Ô nhập tiền - FIX LỖI CHÍNH */
+        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} 75%{transform:rotate(-5deg)} 100%{transform:rotate(0deg)} }
+        .shake { animation: shake 0.15s infinite; }
+
+        .result-sum { font-size: 30px; color: #fff176; margin-bottom: 10px; }
+        .status-text { font-size: 9px; text-transform: uppercase; margin-bottom: 20px; height: 12px; }
+
+        /* BUTTONS TÀI XỈU */
+        .choice-group { display: flex; gap: 10px; width: 100%; margin-bottom: 20px; }
+        .btn-choice { flex: 1; padding: 18px 0; border-radius: 12px; border: none; font-family: 'Press Start 2P', cursive; border-bottom: 4px solid rgba(0,0,0,0.3); }
+        .btn-choice.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.02); }
+        .btn-xiu { background: #3b82f6; color: white; }
+        .btn-tai { background: #ef4444; color: white; }
+        .btn-label { font-size: 14px; display: block; margin-bottom: 4px; }
+        .btn-sub { font-size: 7px; opacity: 0.7; }
+
+        /* PHẦN NHẬP CƯỢC - FIX LỖI KHUNG ĐỎ */
+        .bet-box { background: #111; border-radius: 15px; padding: 15px; width: 100%; border: 1px solid #222; }
+        .bet-info { display: flex; justify-content: space-between; font-size: 7px; color: #666; margin-bottom: 10px; }
+        
+        .bet-input-container { 
+            display: flex; 
+            background: #000; 
+            border: 2px solid #ffeb3b; 
+            border-radius: 10px; 
+            height: 55px; 
+            overflow: hidden; 
+            width: 100%;
+            align-items: stretch;
+        }
+        
         .bet-input { 
             flex: 1; 
             background: transparent; 
             border: none; 
-            color: #fff176; 
+            color: #ffeb3b; 
             font-family: 'Press Start 2P', cursive; 
-            font-size: 24px; 
-            text-align: center; 
-            padding: 15px; 
+            font-size: 16px; 
+            padding: 0 15px; 
             outline: none; 
-            width: 100%;
-            -moz-appearance: textfield; /* Ẩn nút tăng giảm trên Firefox */
+            text-align: right;
+            width: 100%; /* Ép chiếm hết khoảng trống */
+            min-width: 0; /* Fix lỗi input không co lại trên một số máy Android */
         }
-        /* Ẩn nút tăng giảm trên Chrome/Safari */
-        .bet-input::-webkit-outer-spin-button, .bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* Nút MAX - FIX LỖI */
         .btn-max { 
-            background: #fff176; 
-            color: black; 
+            background: #ffeb3b; 
+            color: #000; 
             border: none; 
             font-family: 'Press Start 2P', cursive; 
             font-size: 10px; 
             font-weight: bold; 
             padding: 0 20px; 
-            cursor: pointer; 
-            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
         }
 
-        /* TAB KHÁC */
-        .tab-content.hidden { display: none; }
-        .other-content { padding: 40px; text-align: center; font-size: 9px; line-height: 1.8; color: #aaa; }
+        /* Ẩn nút tăng giảm mặc định */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* FOOTER */
-        .footer { background: black; padding: 15px; text-align: center; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-top: auto;}
+        .tab-content.hidden { display: none; }
+        .footer { padding: 15px; text-align: center; font-size: 6px; color: #333; margin-top: auto; letter-spacing: 1px; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        
         <div class="header">
             <div class="user-info">
                 <div id="avatar" class="avatar">👤</div>
                 <div>
                     <div id="username" class="username">GUEST</div>
-                    <div id="tg-id-display" class="tg-id">ID: LOADING...</div>
+                    <div id="tg-id-display" class="tg-id">ID: 000000</div>
                 </div>
             </div>
             <div class="balance-group">
                 <div id="balance" class="balance-amount">500.00</div>
-                <div class="balance-label">USDT CREDITS</div>
+                <div class="balance-label">CREDITS</div>
             </div>
         </div>
 
@@ -129,7 +125,7 @@
         </div>
 
         <div id="content0" class="tab-content game-content">
-            <div class="label-text">PHIÊN MỚI TRONG</div>
+            <div class="countdown-label">PHIÊN MỚI TRONG</div>
             <div id="countdown" class="countdown-num">20</div>
             
             <div class="dice-area">
@@ -138,51 +134,47 @@
                 <div id="dice3" class="dice">🎲<span class="dice-number">?</span></div>
             </div>
 
-            <div class="dice-area" style="margin-top: -10px; height: 30px;">
-                <div id="result-sum" class="countdown-num" style="font-size: 30px; margin: 0;">?</div>
-            </div>
-            <div id="status-text" class="status-text label-text">MỜI ĐẶT CỬA</div>
+            <div id="result-sum" class="result-sum">?</div>
+            <div id="status-text" class="status-text">MỜI ĐẶT CỬA</div>
 
             <div class="choice-group">
                 <button id="btn-xiu" onclick="selectChoice('Xiu')" class="btn-choice btn-xiu">
-                    <span class="main-label">XỈU</span>
-                    <span class="sub-label">NHỎ (4-10)</span>
+                    <span class="btn-label">XỈU</span>
+                    <span class="btn-sub">4-10</span>
                 </button>
                 <button id="btn-tai" onclick="selectChoice('Tai')" class="btn-choice btn-tai">
-                    <span class="main-label">TÀI</span>
-                    <span class="sub-label">LỚN (11-17)</span>
+                    <span class="btn-label">TÀI</span>
+                    <span class="btn-sub">11-17</span>
                 </button>
             </div>
 
             <div class="bet-box">
-                <div class="bet-header">
-                    <span>Tiền cược</span>
-                    <span>ĐÃ CƯỢC: <span id="current-bet-display" class="bet-current">0.00</span></span>
+                <div class="bet-info">
+                    <span>TIỀN CƯỢC</span>
+                    <span>ĐÃ CƯỢC: <span id="current-bet-display" style="color:#ffeb3b">0.00</span></span>
                 </div>
-                <div class="bet-input-group">
-                    <input id="bet-amount" type="number" value="10" min="1" class="bet-input" oninput="updateBetDisplay()">
+                <div class="bet-input-container">
+                    <input id="bet-amount" type="number" value="10" class="bet-input" oninput="updateBetDisplay()">
                     <button onclick="setMaxBet()" class="btn-max">MAX</button>
                 </div>
             </div>
         </div>
 
-        <div id="content1" class="tab-content hidden other-content">
-            <p style="color: #fff176; margin-bottom: 15px;">NẠP USDT (BEP-20)</p>
-            <div style="background: black; padding: 10px; border-radius: 10px; word-break: break-all; border: 1px solid #333;">0x71C4B136...VíAdmin</div>
-            <p style="margin-top: 15px; font-size: 8px;">Chuyển tiền vào ví trên rồi đợi hệ thống duyệt.</p>
+        <div id="content1" class="tab-content hidden" style="padding: 40px; text-align: center; font-size: 8px;">
+            <p style="color:#ffeb3b">NẠP USDT BEP-20</p>
+            <div style="background:#000; padding:10px; margin:20px 0; border:1px solid #222; word-break:break-all;">0x71C4B136155554157121215444541571212154</div>
+            <p>Vui lòng chuyển khoản và đợi hệ thống duyệt.</p>
         </div>
-        
-        <div id="content2" class="tab-content hidden other-content">
-            <p style="color: #e53935;">RÚT TIỀN</p>
-            <p style="margin-top: 15px;">Tính năng đang bảo trì.</p>
+        <div id="content2" class="tab-content hidden" style="padding: 40px; text-align: center; font-size: 8px;">
+            <p style="color:#ef4444">RÚT TIỀN</p>
+            <p style="margin-top:20px">Tính năng đang bảo trì.</p>
         </div>
 
-        <div class="footer">
-            FAIR PLAY & ANTI-CHEAT SYSTEM
-        </div>
+        <div class="footer">FAIR PLAY & ANTI-CHEAT SYSTEM</div>
     </div>
 
     <script>
+        const tg = window.Telegram.WebApp;
         let telegramId = 'local-user';
         let balance = 500;
         let choice = '';
@@ -190,39 +182,31 @@
         let countdown = 20;
         let countdownInterval = null;
 
-        // Khởi tạo Telegram Web App
-        const tg = window.Telegram.WebApp;
-
-        function initTelegram() {
+        function initApp() {
             tg.ready();
             tg.expand();
             
-            const user = tg.initDataUnsafe.user;
-            if (user) {
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
                 telegramId = user.id.toString();
-                const name = (user.username || user.first_name || "GUEST").toUpperCase();
-                document.getElementById('username').textContent = name;
+                document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
                 document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
-            } else {
-                document.getElementById('tg-id-display').textContent = "ID: WEB_MODE";
             }
             
-            const saved = localStorage.getItem(`balance_${telegramId}`);
+            const saved = localStorage.getItem(`bal_${telegramId}`);
             if (saved) balance = parseFloat(saved);
-            updateBalanceDisplay();
-            updateBetDisplay(); // Cập nhật hiển thị cược ban đầu
+            updateBalance();
+            startCountdown();
         }
 
-        function updateBalanceDisplay() {
+        function updateBalance() {
             document.getElementById('balance').textContent = balance.toFixed(2);
-            localStorage.setItem(`balance_${telegramId}`, balance);
+            localStorage.setItem(`bal_${telegramId}`, balance);
         }
 
         function updateBetDisplay() {
-            let input = document.getElementById('bet-amount');
-            let val = parseFloat(input.value) || 0;
+            let val = parseFloat(document.getElementById('bet-amount').value) || 0;
             if (val > balance) val = balance;
-            if (val < 0) val = 0;
             betAmount = val;
             document.getElementById('current-bet-display').textContent = betAmount.toFixed(2);
         }
@@ -240,18 +224,18 @@
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        function rollDiceAuto() {
+        function rollDice() {
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
             diceEls.forEach(d => d.classList.add('shake'));
-            document.getElementById('status-text').textContent = "ĐANG LẮC MẠNH...";
+            document.getElementById('status-text').textContent = "ĐANG LẮC...";
 
             setTimeout(() => {
                 let total = 0;
                 let results = [];
                 for (let i = 0; i < 3; i++) {
-                    const num = Math.floor(Math.random() * 6) + 1;
-                    results.push(num);
-                    total += num;
+                    const n = Math.floor(Math.random() * 6) + 1;
+                    results.push(n);
+                    total += n;
                 }
 
                 diceEls.forEach((d, i) => {
@@ -260,28 +244,25 @@
                 });
 
                 document.getElementById('result-sum').textContent = total;
-                let outcome = (total >= 11) ? 'Tai' : 'Xiu';
+                const outcome = (total >= 11) ? 'Tai' : 'Xiu';
                 
                 if (choice !== '') {
                     if (choice === outcome) {
                         balance += betAmount;
-                        document.getElementById('status-text').innerHTML = `<span style="color: #4ae3b5;">🎉 THẮNG +${betAmount.toFixed(2)}</span>`;
+                        document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount.toFixed(2)}</span>`;
                         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                     } else {
                         balance -= betAmount;
-                        if (balance < 0) balance = 0; // Chống số dư âm
-                        document.getElementById('status-text').innerHTML = `<span style="color: #e53935;">😢 THUA -${betAmount.toFixed(2)}</span>`;
+                        document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount.toFixed(2)}</span>`;
                         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
                     }
-                    updateBalanceDisplay();
+                    updateBalance();
                 } else {
-                    document.getElementById('status-text').innerHTML = `KẾT QUẢ: <span style="color: #fff176">${outcome.toUpperCase()}</span>`;
+                    document.getElementById('status-text').textContent = "KẾT QUẢ: " + outcome.toUpperCase();
                 }
 
-                // Reset trạng thái
                 choice = '';
                 document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
-                
                 setTimeout(startCountdown, 3000);
             }, 1500);
         }
@@ -292,14 +273,13 @@
             document.getElementById('countdown').textContent = countdown;
             document.getElementById('status-text').textContent = "MỜI ĐẶT CỬA";
             document.getElementById('result-sum').textContent = "?";
-
+            
             countdownInterval = setInterval(() => {
                 countdown--;
-                if (countdown < 0) countdown = 0; // Chống số âm
                 document.getElementById('countdown').textContent = countdown;
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
-                    rollDiceAuto();
+                    rollDice();
                 }
             }, 1000);
         }
@@ -307,12 +287,9 @@
         function switchTab(n) {
             document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('hidden', i !== n));
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === n));
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Khởi động hệ thống
-        initTelegram();
-        startCountdown();
+        initApp();
     </script>
 </body>
 </html>
