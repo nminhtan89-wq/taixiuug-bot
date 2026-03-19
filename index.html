@@ -3,90 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE MASTER PRO - FINAL SERVER</title>
+    <title>DICE MASTER - OFFICIAL SEALED</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; line-height: 1.5; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; position: relative; }
         .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; position: sticky; top: 0; z-index: 100; }
-        .user-profile-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 12px; }
-        .avatar { width: 42px; height: 42px; background: #ffeb3b; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: black; flex-shrink: 0; font-weight: bold; }
-        .username-area { display: flex; flex-direction: column; }
-        .username { font-size: 14px; font-weight: 700; color: #fff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .tg-id { font-size: 10px; color: #4ae3b5; font-weight: 500; }
-        .balance-group { text-align: right; }
-        .balance-amount { font-size: 22px; color: #fff176; font-weight: 900; letter-spacing: -0.5px; }
-        .balance-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 700; }
-        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-content { width: 90%; background: #111; border-radius: 24px; border: 1px solid #333; padding: 25px; position: relative; animation: popUp 0.2s ease-out; }
-        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #666; cursor: pointer; font-weight: bold; }
-        .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; background: #000; padding: 5px; border-radius: 12px; }
-        .tab-nav-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #666; font-weight: bold; font-size: 12px; cursor: pointer; border-radius: 8px; }
-        .tab-nav-btn.active { background: #ffeb3b; color: #000; }
-        .payment-box { display: none; }
-        .payment-box.active { display: block; }
-        .copy-box { background: #000; padding: 15px; border-radius: 12px; border: 1px solid #222; font-size: 11px; color: #fff; word-break: break-all; margin-bottom: 10px; text-align: center; }
-        .btn-copy { background: #ffeb3b; color: #000; border: none; padding: 12px; border-radius: 10px; font-size: 11px; font-weight: 900; width: 100%; cursor: pointer; margin-bottom: 10px; }
-        .form-input { width: 100%; background: #000; border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; margin-bottom: 15px; }
-        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; }
-        .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .countdown-num { font-size: 85px; color: #ffeb3b; font-weight: 900; margin-bottom: 10px; }
-        .dice-area { display: flex; gap: 15px; margin: 20px 0; height: 90px; align-items: center; }
-        .dice { width: 85px; height: 85px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 18px; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 0 20px rgba(255,235,59,0.4); }
-        .dice-number { position: absolute; font-size: 45px; color: #111; font-weight: 900; }
-        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} 75%{transform:rotate(-5deg)} 100%{transform:rotate(0deg)} }
+        .user-profile-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .avatar { width: 40px; height: 40px; background: #ffeb3b; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: black; font-weight: bold; }
+        .balance-amount { font-size: 20px; color: #fff176; font-weight: 900; }
+        .history-container { background: #111; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: center; gap: 6px; overflow: hidden; min-height: 48px; }
+        .ball { width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; color: white; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.4); }
+        .ball-tai { background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000); }
+        .ball-xiu { background: radial-gradient(circle at 30% 30%, #4facfe, #0061ff); }
+        .game-content { padding: 15px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .countdown-num { font-size: 75px; color: #ffeb3b; font-weight: 900; }
+        .dice-area { display: flex; gap: 12px; margin: 15px 0; height: 85px; }
+        .dice { width: 80px; height: 80px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .dice-number { font-size: 45px; color: #111; font-weight: 900; }
         .shake { animation: shake 0.1s infinite; }
-        .status-text { font-size: 15px; font-weight: 700; text-transform: uppercase; min-height: 22px; margin-bottom: 30px; text-align: center; color: #aaa; }
-        .choice-group { display: flex; gap: 12px; width: 100%; margin-bottom: 25px; }
-        .btn-choice { flex: 1; padding: 22px 0; border-radius: 18px; border: none; cursor: pointer; border-bottom: 5px solid rgba(0,0,0,0.3); transition: 0.1s; }
-        .btn-choice.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.02); }
-        .btn-xiu { background: #2563eb; color: white; }
-        .btn-tai { background: #dc2626; color: white; }
-        .btn-label { font-size: 22px; font-weight: 900; display: block; }
-        .bet-box { background: #111; border-radius: 20px; padding: 20px; width: 100%; border: 1px solid #222; }
-        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 65px; overflow: hidden; align-items: stretch; }
-        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 26px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; font-family: 'Inter', sans-serif; }
-        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 15px; font-weight: 900; padding: 0 25px; cursor: pointer; }
-        .footer { padding: 20px; text-align: center; font-size: 10px; color: #333; font-weight: 700; margin-top: auto; letter-spacing: 2px; }
+        @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-8deg)} 50%{transform:rotate(8deg)} 100%{transform:rotate(0deg)} }
+        .choice-group { display: flex; gap: 10px; width: 100%; margin-bottom: 25px; }
+        .btn-choice { flex: 1; padding: 22px 0; border-radius: 15px; border: none; cursor: pointer; border-bottom: 4px solid rgba(0,0,0,0.3); background: #333; color: white; font-weight: 900; font-size: 22px; transition: 0.1s; }
+        .btn-xiu.active { background: #2563eb; outline: 3px solid white; transform: scale(1.02); }
+        .btn-tai.active { background: #dc2626; outline: 3px solid white; transform: scale(1.02); }
+        .bet-box { background: #111; border-radius: 18px; padding: 15px; width: 100%; border: 1px solid #222; }
+        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 12px; height: 60px; overflow: hidden; }
+        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 24px; font-weight: 900; padding: 0 15px; text-align: right; outline: none; font-family: 'Inter', sans-serif; }
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { width: 85%; background: #111; border-radius: 20px; padding: 25px; border: 1px solid #333; animation: popUp 0.2s ease-out; }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .btn-submit { width: 100%; background: #ffeb3b; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 10px; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header">
             <div class="user-profile-btn" onclick="toggleModal(true)">
-                <div id="avatar" class="avatar">👤</div>
+                <div id="avatar" class="avatar">?</div>
                 <div class="username-area">
-                    <div class="username"><span id="username">GUEST USER</span> ▼</div>
-                    <div id="tg-id-display" class="tg-id">ID: 000000000</div>
+                    <div id="username" style="font-size:13px; font-weight:700;">GUEST</div>
+                    <div style="font-size:9px; color:#4ae3b5;">ID: <span id="tg-id-display">...</span> ▼</div>
                 </div>
             </div>
             <div class="balance-group">
                 <div id="balance" class="balance-amount">0.00</div>
-                <div class="balance-label">Credits</div>
+                <div style="font-size:9px; color:#666; text-align:right;">CREDITS</div>
             </div>
         </div>
 
+        <div class="history-container" id="history-bar"></div>
+
         <div id="payment-modal" class="modal-overlay">
             <div class="modal-content">
-                <div class="close-modal" onclick="toggleModal(false)">×</div>
-                <div class="tab-nav">
-                    <button id="btn-tab-nap" class="tab-nav-btn active" onclick="switchPayTab('nap')">NẠP TIỀN</button>
-                    <button id="btn-tab-rut" class="tab-nav-btn" onclick="switchPayTab('rut')">RÚT TIỀN</button>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <button id="btn-tab-nap" style="color:#ffeb3b; background:none; border:none; font-weight:bold; font-size:14px;" onclick="switchPayTab('nap')">NẠP TIỀN</button>
+                    <button id="btn-tab-rut" style="color:#666; background:none; border:none; font-weight:bold; font-size:14px;" onclick="switchPayTab('rut')">RÚT TIỀN</button>
+                    <button onclick="toggleModal(false)" style="color:#fff; background:none; border:none; font-size:18px;">×</button>
                 </div>
-                <div id="box-nap" class="payment-box active">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px; text-align: center;">VÍ USDT (BEP-20)</p>
-                    <div class="copy-box" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
-                    <button class="btn-copy" onclick="copyWallet()">SAO CHÉP VÍ ADMIN</button>
-                    <p style="font-size: 10px; color: #555; text-align: center;">Admin sẽ duyệt Credits sau khi chuyển khoản thành công.</p>
+                
+                <div id="box-nap" style="text-align:center;">
+                    <p style="font-size:10px; color:#888; margin-bottom:10px;">VÍ NHẬN USDT (BEP-20)</p>
+                    <div style="background:#000; padding:12px; font-size:10px; margin-bottom:10px; word-break:break-all; border:1px solid #222; border-radius:8px;" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
+                    <button class="btn-submit" onclick="copyWallet()">SAO CHÉP VÍ ADMIN</button>
+                    <p style="font-size:9px; color:#555; margin-top:10px;">Vui lòng chờ Admin duyệt lệnh sau khi chuyển.</p>
                 </div>
-                <div id="box-rut" class="payment-box">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px;">VÍ NHẬN CỦA BẠN</p>
-                    <input type="text" id="user-wallet-input" class="form-input" placeholder="0x...">
-                    <p style="font-size: 11px; color:#888; margin-bottom: 10px;">SỐ TIỀN RÚT</p>
-                    <input type="number" id="user-withdraw-amount" class="form-input" placeholder="Tối thiểu 100">
+
+                <div id="box-rut" style="display:none;">
+                    <input type="text" id="user-wallet-input" placeholder="Ví nhận BEP-20" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
+                    <input type="number" id="user-withdraw-amount" placeholder="Số tiền cần rút" style="width:100%; padding:15px; margin-bottom:12px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; outline:none;">
                     <button class="btn-submit" onclick="requestWithdraw()">GỬI LỆNH RÚT</button>
                 </div>
             </div>
@@ -99,33 +86,37 @@
                 <div id="dice2" class="dice"><span class="dice-number">?</span></div>
                 <div id="dice3" class="dice"><span class="dice-number">?</span></div>
             </div>
-            <div id="status-text" class="status-text">Mời đặt cửa</div>
+            <div id="status-text" style="font-size:15px; font-weight:700; margin-bottom:25px; color:#aaa; text-transform:uppercase;">Mời đặt cửa...</div>
+            
             <div class="choice-group">
-                <button id="btn-xiu" onclick="selectChoice('Xiu')" class="btn-choice btn-xiu"><span class="btn-label">XỈU</span></button>
-                <button id="btn-tai" onclick="selectChoice('Tai')" class="btn-choice btn-tai"><span class="btn-label">TÀI</span></button>
+                <button id="btn-xiu" onclick="selectChoice('Xiu')" class="btn-choice">XỈU</button>
+                <button id="btn-tai" onclick="selectChoice('Tai')" class="btn-choice">TÀI</button>
             </div>
+
             <div class="bet-box">
                 <div class="bet-input-container">
                     <input id="bet-amount" type="number" value="0" class="bet-input" oninput="validateBet()">
-                    <button onclick="setMaxBet()" class="btn-max">MAX</button>
+                    <button onclick="setMaxBet()" style="background:#ffeb3b; border:none; padding:0 20px; font-weight:900; color:#000;">MAX</button>
                 </div>
             </div>
         </div>
-        <div class="footer">DICE MASTER • SERVER CONNECTED</div>
+        <div style="padding:15px; text-align:center; font-size:9px; color:#222; letter-spacing:1px;">SECURED BY @taixiuug_bot SERVER</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        const BOT_TOKEN = "8755333892:AAGr2PdeZHZL6lm_2CKQr0XqN2W2kTWNOR0";
+        
+        // --- CẤU HÌNH NIÊM PHONG ---
+        const BOT_TOKEN = "8726888181:AAGsxbvvkLumwiey1vWi3o4wfZhLyCnGGw8"; 
         const ADMIN_CHAT_ID = "644381037"; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvvccszq-RwBrlBKMICV29uwDOhQJ5H5epEZGXJQ8Z1AYhO-JcLdn6y8UBt8-B-NU/exec";
 
-        let telegramId = 'local-user';
+        let telegramId = 'guest';
         let balance = 0;
         let choice = '';
         let betAmount = 0;
         let countdown = 20;
-        let countdownInterval = null;
+        let history = [];
 
         async function initApp() {
             tg.ready(); tg.expand();
@@ -133,7 +124,8 @@
                 const user = tg.initDataUnsafe.user;
                 telegramId = user.id.toString();
                 document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
-                document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
+                document.getElementById('tg-id-display').textContent = telegramId;
+                document.getElementById('avatar').textContent = (user.first_name || "G").charAt(0);
             }
             await fetchBalance();
             startCountdown();
@@ -142,10 +134,9 @@
         async function fetchBalance() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=get&userId=${telegramId}`);
-                const data = await res.text();
-                balance = parseFloat(data) || 0;
+                balance = parseFloat(await res.text()) || 0;
                 document.getElementById('balance').textContent = balance.toFixed(2);
-            } catch (e) { console.error("Lỗi Server"); }
+            } catch (e) {}
         }
 
         async function syncBalance(newAmount) {
@@ -154,76 +145,71 @@
             fetch(`${SCRIPT_URL}?action=update&userId=${telegramId}&amount=${balance}`);
         }
 
-        function toggleModal(show) { document.getElementById('payment-modal').style.display = show ? 'flex' : 'none'; }
-        function switchPayTab(tab) {
-            document.getElementById('box-nap').classList.toggle('active', tab === 'nap');
-            document.getElementById('box-rut').classList.toggle('active', tab === 'rut');
-            document.getElementById('btn-tab-nap').classList.toggle('active', tab === 'nap');
-            document.getElementById('btn-tab-rut').classList.toggle('active', tab === 'rut');
-        }
-        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví admin!"); }
-
         async function requestWithdraw() {
             const wallet = document.getElementById('user-wallet-input').value;
             const amount = parseFloat(document.getElementById('user-withdraw-amount').value);
-            if (!wallet || amount <= 0 || amount > balance) { alert("Lỗi rút tiền!"); return; }
-            await syncBalance(balance - amount);
-            const msg = `⚠️ LỆNH RÚT\nID: ${telegramId}\nTiền: ${amount}\nVí: ${wallet}`;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msg)}`);
-            alert("Đã gửi lệnh rút!"); toggleModal(false);
-        }
+            if (!wallet || isNaN(amount) || amount <= 0 || amount > balance) { alert("Dữ liệu không hợp lệ!"); return; }
 
-        function validateBet() {
-            let input = document.getElementById('bet-amount');
-            let val = parseFloat(input.value) || 0;
-            if (val > balance) { val = balance; input.value = val; }
-            betAmount = val;
-        }
-
-        function setMaxBet() { document.getElementById('bet-amount').value = balance; validateBet(); }
-
-        function selectChoice(c) { 
-            if (balance <= 0) return; 
-            choice = c; 
-            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + c.toLowerCase()).classList.add('active'); 
+            const message = `🔔 LỆNH RÚT TIỀN MỚI\n👤 ID: ${telegramId}\n💰 Số tiền: ${amount}\n🏦 Ví: ${wallet}`;
+            try {
+                await syncBalance(balance - amount);
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
+                await fetch(url, { method: 'GET', mode: 'no-cors' });
+                alert("Đã gửi yêu cầu rút tiền thành công!");
+                toggleModal(false);
+            } catch (e) { alert("Lỗi kết nối Bot!"); }
         }
 
         function rollDice() {
             if (choice !== '' && (betAmount > balance || balance <= 0 || betAmount <= 0)) { resetUI(); setTimeout(startCountdown, 3000); return; }
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-            diceEls.forEach(d => { d.classList.add('shake'); d.innerHTML = `<span class="dice-number">?</span>`; });
+            diceEls.forEach(d => { d.classList.add('shake'); d.innerHTML = `?`; });
             
             setTimeout(() => {
                 let total = 0; let results = [];
                 for (let i = 0; i < 3; i++) { const n = Math.floor(Math.random() * 6) + 1; results.push(n); total += n; }
-                diceEls.forEach((d, i) => { d.classList.remove('shake'); d.innerHTML = `<span class="dice-number">${results[i]}</span>`; });
+                diceEls.forEach((d, i) => { d.classList.remove('shake'); d.innerHTML = results[i]; });
                 const outcome = (total >= 11) ? 'Tai' : 'Xiu';
                 
+                history.push(outcome);
+                const bar = document.getElementById('history-bar');
+                bar.innerHTML = '';
+                history.slice(-12).forEach(res => {
+                    const ball = document.createElement('div');
+                    ball.className = `ball ${res === 'Tai' ? 'ball-tai' : 'ball-xiu'}`;
+                    ball.textContent = res === 'Tai' ? 'T' : 'X';
+                    bar.appendChild(ball);
+                });
+
                 if (choice !== '') {
-                    if (choice === outcome) { 
-                        syncBalance(balance + betAmount); 
-                        document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount}</span>`; 
-                    }
-                    else { 
-                        syncBalance(balance - betAmount); 
-                        document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount}</span>`; 
-                    }
+                    if (choice === outcome) { syncBalance(balance + betAmount); document.getElementById('status-text').innerHTML = `<span style="color:#4ae3b5">THẮNG +${betAmount}</span>`; }
+                    else { syncBalance(balance - betAmount); document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">THUA -${betAmount}</span>`; }
                 } else { document.getElementById('status-text').textContent = "KẾT QUẢ: " + outcome.toUpperCase(); }
                 resetUI(); setTimeout(startCountdown, 3000);
             }, 1200);
         }
 
-        function resetUI() { choice = ''; betAmount = 0; document.getElementById('bet-amount').value = 0; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); }
-        
         function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdown = 20; document.getElementById('countdown').textContent = countdown;
-            countdownInterval = setInterval(() => {
-                countdown--; document.getElementById('countdown').textContent = countdown;
-                if (countdown <= 0) { clearInterval(countdownInterval); rollDice(); }
+            countdown = 20;
+            const timer = setInterval(() => {
+                document.getElementById('countdown').textContent = countdown;
+                if (countdown-- <= 0) { clearInterval(timer); rollDice(); }
             }, 1000);
         }
+
+        function toggleModal(s) { document.getElementById('payment-modal').style.display = s ? 'flex' : 'none'; }
+        function switchPayTab(t) {
+            document.getElementById('box-nap').style.display = t === 'nap' ? 'block' : 'none';
+            document.getElementById('box-rut').style.display = t === 'rut' ? 'block' : 'none';
+            document.getElementById('btn-tab-nap').style.color = t === 'nap' ? '#ffeb3b' : '#666';
+            document.getElementById('btn-tab-rut').style.color = t === 'rut' ? '#ffeb3b' : '#666';
+        }
+        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví admin!"); }
+        function validateBet() { let input = document.getElementById('bet-amount'); let val = parseFloat(input.value) || 0; if (val > balance) { val = balance; input.value = val; } betAmount = val; }
+        function setMaxBet() { document.getElementById('bet-amount').value = balance; validateBet(); }
+        function selectChoice(c) { if (balance <= 0) return; choice = c; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); document.getElementById('btn-' + c.toLowerCase()).classList.add('active'); }
+        function resetUI() { choice = ''; betAmount = 0; document.getElementById('bet-amount').value = 0; document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); }
+        
         initApp();
     </script>
 </body>
