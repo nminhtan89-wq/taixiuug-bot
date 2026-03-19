@@ -3,73 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE MASTER PRO</title>
+    <title>DICE MASTER PRO - MODAL UI</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow-x: hidden; line-height: 1.5; }
-        .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow: hidden; line-height: 1.5; }
+        .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; position: relative; }
 
-        /* HEADER */
+        /* HEADER & AVATAR CLICKABLE */
         .header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffeb3b; position: sticky; top: 0; z-index: 100; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
+        
+        /* Hiệu ứng bấm vào Avatar */
+        .user-profile-btn { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 12px; transition: background 0.2s; }
+        .user-profile-btn:active { background: #1a1a1a; }
+        
         .avatar { width: 42px; height: 42px; background: #ffeb3b; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: black; flex-shrink: 0; font-weight: bold; }
+        .username-area { display: flex; flex-direction: column; }
         .username { font-size: 14px; font-weight: 700; color: #fff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .tg-id { font-size: 11px; color: #4ae3b5; font-weight: 500; }
+        .tg-id { font-size: 10px; color: #4ae3b5; font-weight: 500; }
+        .dropdown-icon { font-size: 10px; color: #666; margin-left: 2px; }
+
         .balance-group { text-align: right; }
         .balance-amount { font-size: 22px; color: #fff176; font-weight: 900; letter-spacing: -0.5px; }
         .balance-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 700; }
 
-        /* TABS */
-        .tabs { display: flex; background: #000; border-bottom: 1px solid #222; }
-        .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; color: #555; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
-        .tab-btn.active { color: #ffeb3b; border-bottom: 3px solid #ffeb3b; }
-
-        /* GAME AREA */
-        .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .label-style { font-size: 11px; color: #ffeb3b; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
-        .countdown-num { font-size: 80px; color: #ffeb3b; font-weight: 900; margin: 10px 0; line-height: 1; }
+        /* MENU MODAL (NẠP/RÚT) */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; justify-content: center; align-items: flex-start; padding-top: 80px; backdrop-filter: blur(5px); }
+        .modal-content { width: 90%; background: #111; border-radius: 24px; border: 1px solid #333; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .dice-area { display: flex; gap: 15px; margin: 20px 0; height: 90px; align-items: center; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 20px; color: #666; cursor: pointer; font-weight: bold; }
+        .modal-title { font-size: 18px; font-weight: 900; color: #ffeb3b; margin-bottom: 20px; text-align: center; }
+        
+        .menu-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: #000; border-radius: 15px; margin-bottom: 12px; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        .menu-item:active { background: #222; border-color: #ffeb3b; }
+        .menu-icon { font-size: 20px; }
+        .menu-text { font-weight: 700; font-size: 15px; }
+
+        /* GAME AREA (FULL HEIGHT) */
+        .game-content { padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .label-style { font-size: 11px; color: #ffeb3b; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .countdown-num { font-size: 85px; color: #ffeb3b; font-weight: 900; margin: 10px 0; line-height: 1; text-shadow: 0 0 20px rgba(255,235,59,0.3); }
+        
+        .dice-area { display: flex; gap: 15px; margin: 25px 0; height: 90px; align-items: center; }
         .dice { width: 85px; height: 85px; background: linear-gradient(145deg, #ffeb3b, #f57f17); border-radius: 18px; box-shadow: 0 0 25px rgba(255, 235, 59, 0.4); display: flex; justify-content: center; align-items: center; position: relative; }
         .dice-number { position: absolute; font-size: 45px; color: #111; font-weight: 900; }
         
         @keyframes shake { 0%{transform:rotate(0deg)} 25%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} 75%{transform:rotate(-5deg)} 100%{transform:rotate(0deg)} }
         .shake { animation: shake 0.1s infinite; }
 
-        .result-sum { font-size: 40px; color: #fff176; font-weight: 900; margin-bottom: 10px; }
-        .status-text { font-size: 14px; font-weight: 700; text-transform: uppercase; min-height: 20px; margin-bottom: 25px; text-align: center; }
+        .result-sum { font-size: 45px; color: #fff176; font-weight: 900; margin-bottom: 10px; }
+        .status-text { font-size: 15px; font-weight: 700; text-transform: uppercase; min-height: 22px; margin-bottom: 30px; text-align: center; color: #aaa; }
 
         /* CHOICE BUTTONS */
-        .choice-group { display: flex; gap: 12px; width: 100%; margin-bottom: 20px; }
-        .btn-choice { flex: 1; padding: 20px 0; border-radius: 16px; border: none; cursor: pointer; transition: 0.2s; border-bottom: 5px solid rgba(0,0,0,0.3); }
+        .choice-group { display: flex; gap: 12px; width: 100%; margin-bottom: 25px; }
+        .btn-choice { flex: 1; padding: 22px 0; border-radius: 18px; border: none; cursor: pointer; transition: 0.2s; border-bottom: 5px solid rgba(0,0,0,0.3); }
         .btn-choice.active { outline: 3px solid white; outline-offset: 2px; transform: scale(1.02); }
         .btn-xiu { background: #2563eb; color: white; }
         .btn-tai { background: #dc2626; color: white; }
-        .btn-label { font-size: 20px; font-weight: 900; display: block; margin-bottom: 2px; }
+        .btn-label { font-size: 22px; font-weight: 900; display: block; margin-bottom: 2px; }
         .btn-sub { font-size: 11px; font-weight: 600; opacity: 0.8; }
 
         /* BET BOX */
-        .bet-box { background: #111; border-radius: 20px; padding: 18px; width: 100%; border: 1px solid #222; }
+        .bet-box { background: #111; border-radius: 20px; padding: 20px; width: 100%; border: 1px solid #222; }
         .bet-info { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 12px; font-weight: 700; }
         
-        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 60px; overflow: hidden; width: 100%; align-items: stretch; }
-        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 24px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; width: 100%; font-family: 'Inter', sans-serif; }
-        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 14px; font-weight: 900; padding: 0 25px; cursor: pointer; display: flex; align-items: center; }
+        .bet-input-container { display: flex; background: #000; border: 2px solid #ffeb3b; border-radius: 14px; height: 65px; overflow: hidden; width: 100%; align-items: stretch; }
+        .bet-input { flex: 1; background: transparent; border: none; color: #ffeb3b; font-size: 26px; font-weight: 900; padding: 0 15px; outline: none; text-align: right; width: 100%; font-family: 'Inter', sans-serif; }
+        .btn-max { background: #ffeb3b; color: #000; border: none; font-size: 15px; font-weight: 900; padding: 0 25px; cursor: pointer; display: flex; align-items: center; }
 
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .tab-content.hidden { display: none; }
-        .footer { padding: 20px; text-align: center; font-size: 10px; color: #444; font-weight: 700; margin-top: auto; }
+        .footer { padding: 20px; text-align: center; font-size: 10px; color: #333; font-weight: 700; margin-top: auto; letter-spacing: 2px; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <div class="user-info">
+            <div class="user-profile-btn" onclick="toggleModal(true)">
                 <div id="avatar" class="avatar">👤</div>
-                <div>
-                    <div id="username" class="username">GUEST USER</div>
+                <div class="username-area">
+                    <div class="username"><span id="username">GUEST USER</span> <span class="dropdown-icon">▼</span></div>
                     <div id="tg-id-display" class="tg-id">ID: 000000000</div>
                 </div>
             </div>
@@ -79,13 +93,29 @@
             </div>
         </div>
 
-        <div class="tabs">
-            <button onclick="switchTab(0)" class="tab-btn active" id="tab0">Chơi</button>
-            <button onclick="switchTab(1)" class="tab-btn" id="tab1">Nạp</button>
-            <button onclick="switchTab(2)" class="tab-btn" id="tab2">Rút</button>
+        <div id="profile-modal" class="modal-overlay" onclick="toggleModal(false)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="close-modal" onclick="toggleModal(false)">×</div>
+                <div class="modal-title">QUẢN LÝ TÀI KHOẢN</div>
+                
+                <div class="menu-item" onclick="alert('Tính năng Nạp đang được liên kết...')">
+                    <div class="menu-icon">💰</div>
+                    <div class="menu-text">NẠP USDT (BEP-20)</div>
+                </div>
+                
+                <div class="menu-item" onclick="alert('Tính năng Rút đang bảo trì')">
+                    <div class="menu-icon">💸</div>
+                    <div class="menu-text">RÚT TIỀN THƯỞNG</div>
+                </div>
+
+                <div class="menu-item" onclick="alert('Lịch sử cược đang cập nhật')">
+                    <div class="menu-icon">📜</div>
+                    <div class="menu-text">LỊCH SỬ CƯỢC</div>
+                </div>
+            </div>
         </div>
 
-        <div id="content0" class="tab-content game-content">
+        <div class="game-content">
             <div class="label-style">PHIÊN MỚI TRONG</div>
             <div id="countdown" class="countdown-num">20</div>
             
@@ -121,17 +151,7 @@
             </div>
         </div>
 
-        <div id="content1" class="tab-content hidden" style="padding: 40px; text-align: center;">
-            <p style="color:#ffeb3b; font-weight: 700;">NẠP USDT (BEP-20)</p>
-            <div style="background:#000; padding:15px; margin:20px 0; border:1px solid #222; word-break:break-all; font-size: 12px; border-radius: 10px;">0x71C4B136...AdminWallet</div>
-            <p style="font-size: 11px; color: #888;">Nạp USDT mạng BEP-20 để nhận Credits ngay lập tức.</p>
-        </div>
-        <div id="content2" class="tab-content hidden" style="padding: 40px; text-align: center;">
-            <p style="color:#ef4444; font-weight: 700;">RÚT TIỀN</p>
-            <p style="margin-top:20px; color: #888;">Liên hệ CSKH để thực hiện rút tiền.</p>
-        </div>
-
-        <div class="footer">DICE MASTER • SECURE & FAIR PLAY</div>
+        <div class="footer">DICE MASTER • SECURE & FAIR</div>
     </div>
 
     <script>
@@ -152,23 +172,24 @@
                 document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
                 document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
             }
-            
-            const saved = localStorage.getItem(`bal_final_v5_${telegramId}`);
+            const saved = localStorage.getItem(`bal_final_v6_${telegramId}`);
             balance = saved ? Math.max(0, parseFloat(saved)) : 500.00;
             updateBalance();
             startCountdown();
+        }
+
+        // Đóng mở Modal Nạp/Rút
+        function toggleModal(show) {
+            document.getElementById('profile-modal').style.display = show ? 'flex' : 'none';
+            if (show && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
         function validateBet() {
             let input = document.getElementById('bet-amount');
             let val = parseFloat(input.value);
             balance = Math.max(0, balance);
-            
             if (isNaN(val) || val < 0) val = 0;
-            if (val > balance) {
-                val = balance;
-                input.value = val;
-            }
+            if (val > balance) { val = balance; input.value = val; }
             betAmount = val;
             document.getElementById('current-bet-display').textContent = betAmount.toFixed(2);
         }
@@ -176,7 +197,7 @@
         function updateBalance() {
             balance = Math.max(0, balance);
             document.getElementById('balance').textContent = balance.toFixed(2);
-            localStorage.setItem(`bal_final_v5_${telegramId}`, balance.toString());
+            localStorage.setItem(`bal_final_v6_${telegramId}`, balance.toString());
         }
 
         function setMaxBet() {
@@ -198,7 +219,6 @@
         }
 
         function rollDice() {
-            // Kiểm tra số dư trước khi trừ tiền
             if (choice !== '' && (betAmount > balance || balance <= 0 || betAmount <= 0)) {
                 document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">VUI LÒNG ĐẶT CƯỢC</span>`;
                 resetUI();
@@ -218,7 +238,6 @@
                     results.push(n);
                     total += n;
                 }
-
                 diceEls.forEach((d, i) => {
                     d.classList.remove('shake');
                     d.innerHTML = `🎲<span class="dice-number">${results[i]}</span>`;
@@ -241,21 +260,17 @@
                 } else {
                     document.getElementById('status-text').textContent = "KẾT QUẢ: " + outcome.toUpperCase();
                 }
-
-                // --- LỆNH QUAN TRỌNG: RESET INPUT VỀ 0 SAU KHI LẮC XONG ---
                 resetUI();
-                
                 setTimeout(startCountdown, 3000);
             }, 1500);
         }
 
-        // Hàm Reset giao diện cược
         function resetUI() {
             choice = '';
             betAmount = 0;
-            document.getElementById('bet-amount').value = 0; // Đưa ô nhập về 0
-            document.getElementById('current-bet-display').textContent = "0.00"; // Đưa nhãn hiển thị về 0
-            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); // Bỏ chọn nút Tài/Xỉu
+            document.getElementById('bet-amount').value = 0;
+            document.getElementById('current-bet-display').textContent = "0.00";
+            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
         }
 
         function startCountdown() {
@@ -264,7 +279,6 @@
             document.getElementById('countdown').textContent = countdown;
             document.getElementById('status-text').textContent = "Mời đặt cửa";
             document.getElementById('result-sum').textContent = "?";
-            
             countdownInterval = setInterval(() => {
                 countdown--;
                 document.getElementById('countdown').textContent = countdown;
@@ -273,11 +287,6 @@
                     rollDice();
                 }
             }, 1000);
-        }
-
-        function switchTab(n) {
-            document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('hidden', i !== n));
-            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === n));
         }
 
         initApp();
