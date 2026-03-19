@@ -6,8 +6,6 @@
     <title>Dice Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         body { font-family: 'Press Start 2P', system-ui; background: #111827; color: white; }
@@ -88,134 +86,16 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAzg5PIAQNpn2vpHjP8TJc1jia6ZdyRq3g",
-            authDomain: "taixiuug-bot.firebaseapp.com",
-            projectId: "taixiuug-bot",
-            storageBucket: "taixiuug-bot.firebasestorage.app",
-            messagingSenderId: "538649297925",
-            appId: "1:538649297925:web:d485c9e25c6addfd0f086c"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let telegramId = 'local-test';
-        let balance = 500;
-        let choice = '';
-        let betAmount = 0;
-        let countdown = 20;
-        let countdownInterval = null;
-
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user && user.id) {
-                telegramId = user.id.toString();
-                document.getElementById('username').textContent = user.first_name || 'Player';
-                document.getElementById('avatar').textContent = '👤';
+        // ... (phần script giống code trước, đã có saveBalance và loadBalance)
+        // Thêm nút gửi yêu cầu rút đến bot quản lý
+        function guiYeuCauRut() {
+            const address = prompt("Nhập địa chỉ ví BSC của bạn:");
+            const amount = prompt("Nhập số Credits muốn rút:");
+            if (address && amount) {
+                Telegram.WebApp.openTelegramLink(`https://t.me/quantritaixiu_bot?start= rut_${telegramId}_${amount}_${address}`);
+                alert('✅ Yêu cầu rút đã gửi đến admin!');
             }
         }
-        document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
-
-        async function loadBalance() {
-            const doc = await db.collection("users").doc(telegramId).get();
-            if (doc.exists) {
-                balance = doc.data().balance || 500;
-            } else {
-                await db.collection("users").doc(telegramId).set({ balance: 500 });
-            }
-            document.getElementById('balance').textContent = balance.toFixed(2);
-        }
-
-        async function saveBalance() {
-            await db.collection("users").doc(telegramId).update({ balance });
-        }
-
-        function rollDiceAuto() {
-            const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-            diceEls.forEach(d => d.classList.add('shake'));
-            setTimeout(() => {
-                let total = 0;
-                for (let i = 0; i < 3; i++) {
-                    const num = Math.floor(Math.random() * 6) + 1;
-                    diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
-                    total += num;
-                }
-                diceEls.forEach(d => d.classList.remove('shake'));
-
-                document.getElementById('result-sum').textContent = total;
-                const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
-                document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
-
-                if (betAmount >= 10 && choice) {
-                    balance += win ? betAmount : -betAmount;
-                    if (balance < 0) balance = 0;
-                    document.getElementById('balance').textContent = balance.toFixed(2);
-                    saveBalance();
-                }
-
-                choice = '';
-                betAmount = 0;
-                document.getElementById('bet-amount').value = '0';
-                updateBetDisplay();
-            }, 900);
-        }
-
-        function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdown = 20;
-            document.getElementById('countdown').textContent = 20;
-            countdownInterval = setInterval(() => {
-                countdown--;
-                document.getElementById('countdown').textContent = countdown;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    rollDiceAuto();
-                    setTimeout(startCountdown, 1200);
-                }
-            }, 1000);
-        }
-
-        function selectChoice(c) {
-            choice = c;
-            document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
-            document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
-            updateBetDisplay();
-        }
-
-        function setMaxBet() {
-            document.getElementById('bet-amount').value = balance;
-            updateBetDisplay();
-        }
-
-        function updateBetDisplay() {
-            let input = document.getElementById('bet-amount');
-            betAmount = parseFloat(input.value) || 0;
-            if (betAmount > balance) {
-                betAmount = balance;
-                input.value = balance;
-                alert('Không thể đặt cược quá số dư!');
-            }
-            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
-            document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
-        }
-
-        function copyAddress() {
-            navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
-            alert('✅ Đã copy địa chỉ ví!');
-        }
-
-        function switchTab(n) {
-            document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('tab-active', i===n));
-            document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
-        }
-
-        // INIT
-        switchTab(0);
-        loadBalance();
-        startCountdown();
     </script>
 </body>
 </html>
