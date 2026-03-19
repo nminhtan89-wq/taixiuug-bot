@@ -9,7 +9,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; overflow-x: hidden; line-height: 1.5; }
-
         .app-container { max-width: 450px; margin: 0 auto; background: #050505; min-height: 100vh; display: flex; flex-direction: column; border-x: 1px solid #222; }
 
         /* HEADER */
@@ -113,10 +112,10 @@
             <div class="bet-box">
                 <div class="bet-info">
                     <span>MỨC CƯỢC</span>
-                    <span>ĐÃ CHỌN: <span id="current-bet-display" style="color:#ffeb3b">10.00</span></span>
+                    <span>ĐÃ CHỌN: <span id="current-bet-display" style="color:#ffeb3b">0.00</span></span>
                 </div>
                 <div class="bet-input-container">
-                    <input id="bet-amount" type="number" value="10" class="bet-input" oninput="validateBet()" onblur="validateBet()">
+                    <input id="bet-amount" type="number" value="0" class="bet-input" oninput="validateBet()" onblur="validateBet()">
                     <button onclick="setMaxBet()" class="btn-max">MAX</button>
                 </div>
             </div>
@@ -124,12 +123,12 @@
 
         <div id="content1" class="tab-content hidden" style="padding: 40px; text-align: center;">
             <p style="color:#ffeb3b; font-weight: 700;">NẠP USDT (BEP-20)</p>
-            <div style="background:#000; padding:15px; margin:20px 0; border:1px solid #222; word-break:break-all; font-size: 12px; border-radius: 10px;">0x71C4B136155554157121215444541571212154</div>
-            <p style="font-size: 11px; color: #888;">Sau khi chuyển khoản, vui lòng chờ 1-3 phút để hệ thống xác nhận.</p>
+            <div style="background:#000; padding:15px; margin:20px 0; border:1px solid #222; word-break:break-all; font-size: 12px; border-radius: 10px;">0x71C4B136...AdminWallet</div>
+            <p style="font-size: 11px; color: #888;">Nạp USDT mạng BEP-20 để nhận Credits ngay lập tức.</p>
         </div>
         <div id="content2" class="tab-content hidden" style="padding: 40px; text-align: center;">
             <p style="color:#ef4444; font-weight: 700;">RÚT TIỀN</p>
-            <p style="margin-top:20px; color: #888;">Hệ thống bảo trì.</p>
+            <p style="margin-top:20px; color: #888;">Liên hệ CSKH để thực hiện rút tiền.</p>
         </div>
 
         <div class="footer">DICE MASTER • SECURE & FAIR PLAY</div>
@@ -137,10 +136,10 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        let telegramId = 'local-test';
-        let balance = 500;
+        let telegramId = 'local-user';
+        let balance = 500.00;
         let choice = '';
-        let betAmount = 10;
+        let betAmount = 0.00;
         let countdown = 20;
         let countdownInterval = null;
 
@@ -153,8 +152,9 @@
                 document.getElementById('username').textContent = (user.username || user.first_name).toUpperCase();
                 document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
             }
-            const saved = localStorage.getItem(`bal_v4_${telegramId}`);
-            if (saved) balance = parseFloat(saved);
+            
+            const saved = localStorage.getItem(`bal_final_v5_${telegramId}`);
+            balance = saved ? Math.max(0, parseFloat(saved)) : 500.00;
             updateBalance();
             startCountdown();
         }
@@ -162,6 +162,8 @@
         function validateBet() {
             let input = document.getElementById('bet-amount');
             let val = parseFloat(input.value);
+            balance = Math.max(0, balance);
+            
             if (isNaN(val) || val < 0) val = 0;
             if (val > balance) {
                 val = balance;
@@ -172,32 +174,36 @@
         }
 
         function updateBalance() {
+            balance = Math.max(0, balance);
             document.getElementById('balance').textContent = balance.toFixed(2);
-            localStorage.setItem(`bal_v4_${telegramId}`, balance);
+            localStorage.setItem(`bal_final_v5_${telegramId}`, balance.toString());
         }
 
         function setMaxBet() {
+            if (balance <= 0) return;
             document.getElementById('bet-amount').value = balance;
             validateBet();
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
         function selectChoice(c) {
+            if (balance <= 0) {
+                document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">NẠP THÊM ĐỂ TIẾP TỤC</span>`;
+                return;
+            }
             choice = c;
             document.getElementById('btn-tai').classList.toggle('active', c === 'Tai');
             document.getElementById('btn-xiu').classList.toggle('active', c === 'Xiu');
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // --- HÀM LẮC XÚC XẮC ĐÃ CHẶN LỖI HẾT ĐIỂM ---
         function rollDice() {
-            // Kiểm tra: Nếu người chơi có chọn cửa nhưng tiền cược bằng 0 hoặc lớn hơn số dư
-            if (choice !== '' && (betAmount <= 0 || betAmount > balance)) {
-                document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">HẾT TIỀN! VUI LÒNG NẠP THÊM</span>`;
-                choice = ''; // Hủy lựa chọn để không bị trừ tiền vớ vẩn
-                document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
+            // Kiểm tra số dư trước khi trừ tiền
+            if (choice !== '' && (betAmount > balance || balance <= 0 || betAmount <= 0)) {
+                document.getElementById('status-text').innerHTML = `<span style="color:#ef4444">VUI LÒNG ĐẶT CƯỢC</span>`;
+                resetUI();
                 setTimeout(startCountdown, 3000);
-                return; // Dừng lại không lắc
+                return;
             }
 
             const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
@@ -236,10 +242,20 @@
                     document.getElementById('status-text').textContent = "KẾT QUẢ: " + outcome.toUpperCase();
                 }
 
-                choice = '';
-                document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active'));
+                // --- LỆNH QUAN TRỌNG: RESET INPUT VỀ 0 SAU KHI LẮC XONG ---
+                resetUI();
+                
                 setTimeout(startCountdown, 3000);
             }, 1500);
+        }
+
+        // Hàm Reset giao diện cược
+        function resetUI() {
+            choice = '';
+            betAmount = 0;
+            document.getElementById('bet-amount').value = 0; // Đưa ô nhập về 0
+            document.getElementById('current-bet-display').textContent = "0.00"; // Đưa nhãn hiển thị về 0
+            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('active')); // Bỏ chọn nút Tài/Xỉu
         }
 
         function startCountdown() {
