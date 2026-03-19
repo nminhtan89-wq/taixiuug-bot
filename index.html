@@ -42,15 +42,18 @@
         <div id="content0" class="flex-1 p-6">
             <div class="text-center mb-2 text-yellow-300 text-xs">VÒNG MỚI SAU</div>
             <div id="countdown" class="text-center text-7xl font-bold text-yellow-400 mb-6">20</div>
+
             <div class="flex justify-center gap-6 mb-8">
                 <div id="dice1" class="dice">🎲<span class="dice-number">?</span></div>
                 <div id="dice2" class="dice">🎲<span class="dice-number">?</span></div>
                 <div id="dice3" class="dice">🎲<span class="dice-number">?</span></div>
             </div>
+
             <div class="text-center mb-6">
                 <div id="result-sum" class="text-4xl font-bold text-yellow-400">?</div>
                 <div id="result-text" class="text-2xl font-bold mt-2"></div>
             </div>
+
             <div class="bg-zinc-800 rounded-2xl p-6">
                 <div class="text-center text-xs mb-4">ĐÃ CƯỢC: <span id="current-bet-display" class="text-yellow-400 font-bold">0 Credits</span> (<span id="current-choice-display" class="text-yellow-400">chưa chọn</span>)</div>
                 <div class="flex gap-4 mb-6">
@@ -74,116 +77,117 @@
             </div>
         </div>
 
-        <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Dữ liệu gửi về máy tính bạn</div>
+        <div class="bg-black p-4 text-center text-xs text-zinc-500">Auto roll 20s • Dữ liệu gửi về máy tính anh</div>
     </div>
 
-   <script>
-    let telegramId = 'local-test';
-    let balance = 500;
-    let choice = '';
-    let betAmount = 0;
-    let countdown = 20;
-    let countdownInterval = null;
+    <script>
+        let telegramId = 'local-test';
+        let balance = 500;
+        let choice = '';
+        let betAmount = 0;
+        let countdown = 20;
+        let countdownInterval = null;
 
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-        const user = Telegram.WebApp.initDataUnsafe.user;
-        if (user && user.id) {
-            telegramId = user.id.toString();
-            document.getElementById('username').textContent = user.first_name || 'Player';
-            document.getElementById('avatar').textContent = '👤';
-        }
-    }
-    document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
-
-    function updateBetDisplay() {
-        let input = document.getElementById('bet-amount');
-        betAmount = parseFloat(input.value) || 0;
-        if (betAmount > balance) {
-            betAmount = balance;
-            input.value = balance;
-            alert('❌ Không đủ Credits!');
-        }
-        document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
-        document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
-    }
-
-    function setMaxBet() {
-        document.getElementById('bet-amount').value = balance;
-        updateBetDisplay();
-    }
-
-    function rollDiceAuto() {
-        const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
-        diceEls.forEach(d => d.classList.add('shake'));
-        setTimeout(() => {
-            let total = 0;
-            for (let i = 0; i < 3; i++) {
-                const num = Math.floor(Math.random() * 6) + 1;
-                diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
-                total += num;
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (user && user.id) {
+                telegramId = user.id.toString();
+                document.getElementById('username').textContent = user.first_name || 'Player';
             }
-            diceEls.forEach(d => d.classList.remove('shake'));
+        }
+        document.getElementById('tg-id-display').textContent = `ID: ${telegramId}`;
 
-            document.getElementById('result-sum').textContent = total;
-            const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
-            document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
-
-            if (betAmount >= 10 && choice) {
-                balance += win ? betAmount : -betAmount;
-                if (balance < 0) balance = 0;
-                document.getElementById('balance').textContent = balance.toFixed(2);
-
-                // GỬI DỮ LIỆU VỀ MÁY ANH (đây là cách chuẩn)
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'update_balance',
-                    telegramId: telegramId,
-                    balance: balance
-                }));
+        function updateBetDisplay() {
+            let input = document.getElementById('bet-amount');
+            betAmount = parseFloat(input.value) || 0;
+            if (betAmount > balance) {
+                betAmount = balance;
+                input.value = balance;
+                alert('❌ Không đủ Credits!');
             }
+            document.getElementById('current-bet-display').textContent = betAmount + ' Credits';
+            document.getElementById('current-choice-display').textContent = choice || 'chưa chọn';
+        }
 
-            choice = '';
-            betAmount = 0;
-            document.getElementById('bet-amount').value = '0';
+        function setMaxBet() {
+            document.getElementById('bet-amount').value = balance;
             updateBetDisplay();
-        }, 900);
-    }
+        }
 
-    function startCountdown() {
-        if (countdownInterval) clearInterval(countdownInterval);
-        countdown = 20;
-        document.getElementById('countdown').textContent = 20;
-        countdownInterval = setInterval(() => {
-            countdown--;
-            document.getElementById('countdown').textContent = countdown;
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                rollDiceAuto();
-                setTimeout(startCountdown, 1200);
-            }
-        }, 1000);
-    }
+        function rollDiceAuto() {
+            const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+            diceEls.forEach(d => d.classList.add('shake'));
+            setTimeout(() => {
+                let total = 0;
+                for (let i = 0; i < 3; i++) {
+                    const num = Math.floor(Math.random() * 6) + 1;
+                    diceEls[i].innerHTML = `🎲<span class="dice-number">${num}</span>`;
+                    total += num;
+                }
+                diceEls.forEach(d => d.classList.remove('shake'));
 
-    function selectChoice(c) {
-        choice = c;
-        document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
-        document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
-        updateBetDisplay();
-    }
+                document.getElementById('result-sum').textContent = total;
+                const win = (choice === 'Tai' && total > 10) || (choice === 'Xiu' && total <= 10);
+                document.getElementById('result-text').innerHTML = win ? '🎉 THẮNG!' : '😢 THUA';
 
-    function copyAddress() {
-        navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
-        alert('✅ Đã copy địa chỉ ví!');
-    }
+                if (betAmount >= 10 && choice) {
+                    balance += win ? betAmount : -betAmount;
+                    if (balance < 0) balance = 0;
+                    document.getElementById('balance').textContent = balance.toFixed(2);
 
-    function switchTab(n) {
-        document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('tab-active', i===n));
-        document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
-    }
+                    // GỬI DỮ LIỆU VỀ MÁY ANH (đã fix)
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'update_balance',
+                        telegramId: telegramId,
+                        balance: balance
+                    }));
+                }
 
-    switchTab(0);
-    startCountdown();
-</script>
+                choice = '';
+                betAmount = 0;
+                document.getElementById('bet-amount').value = '0';
+                updateBetDisplay();
+
+                // RESET ĐỂ CHƠI LẦN 2
+                startCountdown();
+            }, 900);
+        }
+
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdown = 20;
+            document.getElementById('countdown').textContent = 20;
+            countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    rollDiceAuto();
+                }
+            }, 1000);
+        }
+
+        function selectChoice(c) {
+            choice = c;
+            document.getElementById('btn-tai').classList.toggle('bg-green-500', c === 'Tai');
+            document.getElementById('btn-xiu').classList.toggle('bg-red-500', c === 'Xiu');
+            updateBetDisplay();
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText("0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de");
+            alert('✅ Đã copy địa chỉ ví!');
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('#tab0,#tab1,#tab2,#tab3').forEach((b,i) => b.classList.toggle('tab-active', i===n));
+            document.querySelectorAll('#content0,#content1').forEach((c,i) => c.classList.toggle('hidden', i!==n));
+        }
+
+        switchTab(0);
+        startCountdown();
+    </script>
 </body>
 </html>
