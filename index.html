@@ -135,22 +135,28 @@
             fetch(`${SCRIPT_URL}?action=update&userId=${telegramId}&amount=${balance}`);
         }
 
-        async function requestWithdraw() {
-            const wallet = document.getElementById('user-wallet-input').value;
-            const amountInput = parseFloat(document.getElementById('user-withdraw-amount').value);
-            if (!wallet || isNaN(amountInput) || amountInput <= 0 || amountInput > balance) { alert("Lỗi!"); return; }
+       async function requestWithdraw() {
+    const wallet = document.getElementById('user-wallet-input').value;
+    const withdrawAmount = parseFloat(document.getElementById('user-withdraw-amount').value); // Số tiền khách nhập
+    
+    if (!wallet || isNaN(withdrawAmount) || withdrawAmount <= 0 || withdrawAmount > balance) {
+        alert("Thông tin không hợp lệ!"); return;
+    }
 
-            let newBalance = balance - amountInput;
-            try {
-                const url = `${SCRIPT_URL}?action=withdraw&userId=${telegramId}&amount=${newBalance}&wallet=${encodeURIComponent(wallet)}`;
-                const res = await fetch(url);
-                if (await res.text() === "SENT") {
-                    balance = newBalance;
-                    document.getElementById('balance').textContent = balance.toFixed(2);
-                    alert("Đã gửi lệnh rút thành công!");
-                    toggleModal(false);
-                }
-            } catch (e) { alert("Lỗi kết nối Server!"); }
+    let newBalance = balance - withdrawAmount; // Số dư còn lại sau khi trừ
+
+    try {
+        // Gửi cả Số dư mới VÀ Số tiền muốn rút lên Server
+        const url = `${SCRIPT_URL}?action=withdraw&userId=${telegramId}&amount=${newBalance}&withdrawAmount=${withdrawAmount}&wallet=${encodeURIComponent(wallet)}`;
+        const res = await fetch(url);
+        if (await res.text() === "SENT") {
+            balance = newBalance;
+            document.getElementById('balance').textContent = balance.toFixed(2);
+            alert("Đã gửi lệnh rút thành công!");
+            toggleModal(false);
+        }
+    } catch (e) { alert("Lỗi server!"); }
+}
         }
 
         function rollDice() {
