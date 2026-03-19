@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE MASTER PRO - SERVER CONNECTED</title>
+    <title>DICE MASTER PRO - FINAL SERVER</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -80,7 +80,7 @@
                     <p style="font-size: 11px; color:#888; margin-bottom: 10px; text-align: center;">VÍ USDT (BEP-20)</p>
                     <div class="copy-box" id="admin-wallet">0x7f8dedb8c6d352391475fbb7c43e49fd1efb58de</div>
                     <button class="btn-copy" onclick="copyWallet()">SAO CHÉP VÍ ADMIN</button>
-                    <p style="font-size: 10px; color: #555; text-align: center;">Admin sẽ duyệt Credits sau khi bạn chuyển khoản thành công.</p>
+                    <p style="font-size: 10px; color: #555; text-align: center;">Admin sẽ duyệt Credits sau khi chuyển khoản thành công.</p>
                 </div>
                 <div id="box-rut" class="payment-box">
                     <p style="font-size: 11px; color:#888; margin-bottom: 10px;">VÍ NHẬN CỦA BẠN</p>
@@ -118,8 +118,6 @@
         const tg = window.Telegram.WebApp;
         const BOT_TOKEN = "8755333892:AAGr2PdeZHZL6lm_2CKQr0XqN2W2kTWNOR0";
         const ADMIN_CHAT_ID = "644381037"; 
-        
-        // ĐÃ DÁN ĐÚNG LINK CỦA BẠN VÀO ĐÂY:
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvvccszq-RwBrlBKMICV29uwDOhQJ5H5epEZGXJQ8Z1AYhO-JcLdn6y8UBt8-B-NU/exec";
 
         let telegramId = 'local-user';
@@ -153,7 +151,6 @@
         async function syncBalance(newAmount) {
             balance = Math.max(0, newAmount);
             document.getElementById('balance').textContent = balance.toFixed(2);
-            // Gửi lệnh cập nhật lên Google Sheets
             fetch(`${SCRIPT_URL}?action=update&userId=${telegramId}&amount=${balance}`);
         }
 
@@ -164,16 +161,13 @@
             document.getElementById('btn-tab-nap').classList.toggle('active', tab === 'nap');
             document.getElementById('btn-tab-rut').classList.toggle('active', tab === 'rut');
         }
-        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy!"); }
+        function copyWallet() { navigator.clipboard.writeText(document.getElementById('admin-wallet').innerText); alert("Đã copy ví admin!"); }
 
         async function requestWithdraw() {
             const wallet = document.getElementById('user-wallet-input').value;
             const amount = parseFloat(document.getElementById('user-withdraw-amount').value);
             if (!wallet || amount <= 0 || amount > balance) { alert("Lỗi rút tiền!"); return; }
-            
-            // Trừ tiền ngay lập tức trên server
             await syncBalance(balance - amount);
-
             const msg = `⚠️ LỆNH RÚT\nID: ${telegramId}\nTiền: ${amount}\nVí: ${wallet}`;
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msg)}`);
             alert("Đã gửi lệnh rút!"); toggleModal(false);
